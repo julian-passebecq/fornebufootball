@@ -1,9 +1,13 @@
-/* V14: place the red team warning on its own row below the right strategy panel. */
+/* V14: keep the red team warning directly below the right strategy panel. */
+.workspace-grid{position:relative}
+
 .rule-below-sidebar{
-  grid-column:2;
-  align-self:start;
-  margin-top:14px;
-  width:100%;
+  position:absolute;
+  top:var(--rule-top,0);
+  left:var(--rule-left,0);
+  width:var(--rule-width,100%);
+  margin:0;
+  z-index:2;
 }
 
 .rule-below-sidebar .compact-rule{
@@ -36,7 +40,9 @@
 
 @media(max-width:980px){
   .rule-below-sidebar{
+    position:static;
     grid-column:1;
+    width:100%;
     margin-top:12px;
   }
 }
