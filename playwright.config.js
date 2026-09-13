@@ -2,7 +2,13 @@ import { defineConfig, devices } from '@playwright/test'
 export default defineConfig({
   testDir:'./tests/browser', fullyParallel:true, timeout:35000, expect:{timeout:7000},
   workers:2, retries:0, reporter:[['list'],['html',{open:'never'}],['json',{outputFile:'test-results/results.json'}]],
-  use:{baseURL:'http://127.0.0.1:4173',trace:'retain-on-failure',screenshot:'only-on-failure',reducedMotion:'reduce'},
+  use:{
+    baseURL:'http://127.0.0.1:4173',
+    trace:'retain-on-failure',
+    screenshot:'only-on-failure',
+    reducedMotion:'reduce',
+    storageState:{cookies:[],origins:[{origin:'http://127.0.0.1:4173',localStorage:[{name:'fornebu-pitch-view',value:'auto'}]}]},
+  },
   projects:[
     {name:'desktop-chromium',use:{browserName:'chromium',viewport:{width:1440,height:900}}},
     {name:'iphone-webkit',use:{...devices['iPhone 13'],browserName:'webkit'}},
