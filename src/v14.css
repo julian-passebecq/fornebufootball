@@ -168,6 +168,27 @@
   color:#7e2e2e!important;
 }
 
+/* Ribbon now shows only 7v7 / 9v9: no redundant number icon or formation subtitle. */
+.format-selector .format-icon,
+.format-selector small{display:none!important}
+.format-selector button{
+  min-width:108px!important;
+  min-height:48px!important;
+  padding:10px 18px!important;
+  justify-content:center!important;
+  gap:0!important;
+}
+.format-selector button>span:last-child{
+  align-items:center!important;
+  justify-content:center!important;
+}
+.format-selector strong{
+  font-size:18px!important;
+  line-height:1!important;
+  font-weight:950!important;
+  letter-spacing:.01em!important;
+}
+
 /* Tablet / iPad: stack pitch and instructions instead of squeezing both columns. */
 @media(max-width:1180px){
   main{padding:14px!important}
@@ -211,7 +232,8 @@
   .v9-club-brand span{font-size:9px!important}
 
   .format-selector{gap:6px!important;padding:5px!important}
-  .format-selector button{min-height:48px!important}
+  .format-selector button{min-height:46px!important;min-width:88px!important;padding:9px 14px!important}
+  .format-selector strong{font-size:16px!important}
 
   .public-shell .v9-board-heading{
     grid-template-columns:auto 1fr auto!important;
@@ -259,4 +281,6 @@
   .public-shell .jersey{width:38px!important;height:44px!important}
   .public-shell .jersey:before{width:33px!important;height:37px!important}
   .coach-shell .v9-header-actions{flex-wrap:wrap!important;justify-content:flex-end!important}
+  .format-selector button{min-width:78px!important;padding-inline:11px!important}
+  .format-selector strong{font-size:15px!important}
 }
