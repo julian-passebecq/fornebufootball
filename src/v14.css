@@ -1,0 +1,42 @@
+/* V14: place the red team warning on its own row below the right strategy panel. */
+.rule-below-sidebar{
+  grid-column:2;
+  align-self:start;
+  margin-top:14px;
+  width:100%;
+}
+
+.rule-below-sidebar .compact-rule{
+  margin:0!important;
+  width:100%;
+  box-sizing:border-box;
+  min-height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:11px 14px!important;
+  border-radius:11px!important;
+  text-align:center;
+  line-height:1.25;
+}
+
+.rule-below-sidebar .compact-rule-editor{
+  margin:0!important;
+  width:100%;
+  box-sizing:border-box;
+}
+
+.rule-below-sidebar .compact-rule-editor textarea{
+  width:100%;
+  box-sizing:border-box;
+}
+
+/* Once the rule has moved, the left pitch card ends cleanly after IN / OUT + player hint. */
+.board-card .principles-panel{margin-bottom:0!important}
+
+@media(max-width:980px){
+  .rule-below-sidebar{
+    grid-column:1;
+    margin-top:12px;
+  }
+}
