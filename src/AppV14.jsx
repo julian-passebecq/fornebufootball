@@ -8,6 +8,7 @@ export default function AppV14() {
     if (!root) return undefined
 
     let frame = 0
+    let coachLanguageInitialized = false
 
     function syncCoachChrome() {
       const cleanPath = window.location.pathname.replace(/\/+$/, '') || '/'
@@ -15,15 +16,17 @@ export default function AppV14() {
       const coachShell = root.querySelector('.coach-shell')
       const coachGate = root.querySelector('.coach-gate-page')
 
-      // Coach opens in French by default, but can preview EN / NO.
-      if (coachRoute && !sessionStorage.getItem('fornebu-coach-language-initialized')) {
+      // Coach opens in French on every visit, but can preview EN / NO afterwards.
+      if (coachRoute && !coachLanguageInitialized) {
         const frButton = coachShell
           ? root.querySelector('.coach-shell .v10-lang-switch button:nth-child(2)')
           : coachGate
             ? root.querySelector('.coach-gate-page .gate-language button:nth-child(2)')
             : null
-        if (frButton && !frButton.classList.contains('active')) frButton.click()
-        if (frButton) sessionStorage.setItem('fornebu-coach-language-initialized', '1')
+        if (frButton) {
+          if (!frButton.classList.contains('active')) frButton.click()
+          coachLanguageInitialized = true
+        }
       }
 
       // Coach access stays private via /coach. Never expose a coach button on the student page.
