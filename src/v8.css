@@ -1,0 +1,82 @@
+:root{--ffk-sky:#7ccbe8;--ffk-sky-strong:#2f9fd0;--ffk-sky-soft:#edf8fc;--ffk-navy:#244f6b;--ffk-line:#d4e7ee;--ffk-ink:#183342}
+
+/* Header: team selector is truly centered; next game is a separate card farther right. */
+.v7-topbar{position:sticky;grid-template-columns:minmax(270px,1fr) minmax(280px,1fr) auto;gap:20px;min-height:94px;padding:10px 24px}
+.v7-club-brand{grid-column:1;justify-self:start}
+.v7-brand-mark,.gate-mark{object-fit:contain;background:#fff;border-radius:50%!important;box-shadow:0 3px 12px #315d7020!important}
+.v7-team-ribbon{position:absolute!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;width:auto!important;background:#edf4f6!important;border:1px solid #d9e9ef!important;border-radius:16px!important;padding:6px 8px!important;box-shadow:inset 0 1px 0 #fff!important}
+.v7-team-tabs{gap:9px!important}
+.v7-team-tabs button{min-width:112px!important;padding:8px 12px 8px 9px!important}
+.v7-team-tab-label{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:4px!important;line-height:1!important}
+.v7-team-tab-label strong{font-size:12px!important}
+.v7-team-tab-label small{display:block!important;margin:0!important;font-size:9px!important;line-height:1!important;font-weight:900!important;letter-spacing:.05em!important;color:#7e98a3!important}
+.v7-team-tabs button.active .v7-team-tab-label small{color:#2685ac!important}
+.v7-next-game-card{grid-column:2;justify-self:end;align-self:center;width:260px;min-width:260px!important;margin:0 32px 0 0!important;padding:10px 15px!important;border:1px solid #d4e7ee!important;border-left:1px solid #d4e7ee!important;border-radius:14px!important;background:#f8fcfe!important;box-shadow:0 3px 12px #315d7010;display:flex!important;flex-direction:column!important;line-height:1.05!important}
+.v7-next-game-card>span{font-size:8px!important;text-transform:uppercase;letter-spacing:.11em;font-weight:900;color:#6c8996}
+.v7-next-game-card strong{margin-top:4px!important;font-size:11px!important;color:#1d465c}
+.v7-next-game-card small{margin-top:4px!important;font-size:9px!important;color:#2784aa!important;font-weight:850!important}
+.v7-header-actions{grid-column:3;justify-self:end}
+
+/* Pitch header: compact team/format pill left, formation centered, plan right. */
+.v7-board-heading{grid-template-columns:1fr auto 1fr!important;min-height:62px!important;margin-bottom:8px!important}
+.board-context-pill{justify-self:start;display:inline-flex;align-items:center;gap:8px;border:1px solid #c9e4ef;background:#edf8fc;color:#1c789e;border-radius:999px;padding:7px 11px;font-size:10px;text-transform:uppercase;letter-spacing:.055em;font-weight:900;box-shadow:0 2px 7px #2f9fd00d}
+.board-context-pill span{padding-left:8px;border-left:1px solid #c9e4ef;color:#567a89}
+.v7-board-heading-right{justify-self:end!important;max-width:none!important}
+.v7-board-card{padding-bottom:12px!important}
+.pitch-footer-hint{text-align:center;margin:9px 4px 1px;font-size:10px;line-height:1.35;color:#7b919a;min-height:14px}
+.coach-shell .pitch-footer-hint{color:#567d8c}
+
+/* Player sidebar: number and position are on one line, categories breathe more, no X close control. */
+.v7-player-sidebar-head{margin-bottom:15px!important;padding-right:0!important}
+.v7-player-identity{width:100%;align-items:center!important;gap:14px!important}
+.v7-player-meta{flex:1;min-width:0}
+.v7-player-meta>.eyebrow{margin-bottom:5px!important}
+.v7-player-number-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.v7-player-number-row h2{margin:0!important;font-size:23px!important;line-height:1!important}
+.v7-role-line{margin:0!important;display:flex!important;align-items:center!important;gap:7px!important;white-space:nowrap}
+.v7-role-line span{font-size:10px!important;color:#82959d!important}
+.v7-role-line strong{font-size:10px!important;padding:5px 8px!important;background:#eef6f8!important;color:#315d70!important;border:1px solid #d8e8ee}
+.v7-player-topics{gap:13px!important}
+.v7-player-topic{padding:13px 13px 14px!important}
+.v7-player-topic .player-topic-head{margin-bottom:9px!important}
+.v7-back-team-button{display:block!important;width:auto!important;min-width:0!important;margin:11px auto 0!important;padding:7px 12px!important;border-radius:8px!important;font-size:10px!important;line-height:1.1!important;font-weight:800!important;color:#526b75!important;background:#fff!important}
+.close-player{display:none!important}
+
+/* The official crest comes from NFF; do not crop a merchandise photo. */
+.v7-brand-mark{width:46px!important;height:46px!important}
+
+@media(max-width:1400px){
+  .v7-topbar{grid-template-columns:minmax(235px,1fr) minmax(245px,1fr) auto;gap:14px;padding-inline:18px}
+  .v7-team-tabs button{min-width:102px!important;padding-inline:9px!important}
+  .v7-next-game-card{width:225px;min-width:225px!important;margin-right:18px!important;padding-inline:12px!important}
+}
+
+@media(max-width:1180px){
+  .v7-topbar{grid-template-columns:1fr auto!important;min-height:78px!important;margin-bottom:142px!important}
+  .v7-club-brand{grid-column:1}
+  .v7-header-actions{grid-column:2}
+  .v7-team-ribbon{top:84px!important;left:0!important;right:0!important;transform:none!important;width:100%!important;border-radius:0!important;justify-content:center!important}
+  .v7-team-tabs{margin:0 auto!important}
+  .v7-next-game-card{position:absolute;top:145px;left:50%;transform:translateX(-50%);width:min(330px,calc(100vw - 24px));min-width:0!important;margin:0!important;align-items:center;text-align:center}
+  .v7-board-heading{grid-template-columns:1fr auto 1fr!important}
+}
+
+@media(max-width:760px){
+  .v7-topbar{margin-bottom:154px!important}
+  .v7-team-ribbon{top:70px!important;padding:7px 8px!important}
+  .v7-team-tabs{display:grid!important;grid-template-columns:repeat(3,1fr)!important;width:100%!important;gap:6px!important}
+  .v7-team-tabs button{min-width:0!important;justify-content:center!important;padding:7px 5px!important}
+  .v7-team-tab-label{align-items:center!important}
+  .v7-team-tab-label strong{font-size:10px!important;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .v7-team-tab-label small{font-size:8px!important}
+  .v7-next-game-card{top:126px;width:calc(100vw - 24px);padding:7px 10px!important}
+  .v7-board-heading{grid-template-columns:1fr auto!important;gap:8px!important}
+  .board-context-pill{font-size:9px;padding:6px 8px}
+  .formation-center-badge{grid-column:auto!important;grid-row:auto!important;justify-self:center!important;min-width:82px!important}
+  .v7-board-heading-right{display:block!important}
+  .v7-board-heading-right .active-plan-pill{font-size:8px!important;padding:5px 7px!important}
+  .pitch-footer-hint{font-size:9px;margin-top:7px}
+  .v7-player-number-row{gap:9px}
+  .v7-role-line{white-space:normal}
+  .v7-player-topics{gap:10px!important}
+}
