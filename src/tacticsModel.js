@@ -12,11 +12,10 @@ export const ROLE_COLORS = {
   attacker: '#d85e5e',
 }
 
-export const DEFAULT_TEAMS = [
-  { id: 'team1', number: 1, name: 'Team 1', formation: '9v9', nextGame: { date: '2026-09-19', time: '10:30', opponent: 'Stabæk' } },
-  { id: 'team2', number: 2, name: 'Team 2', formation: '9v9', nextGame: { date: '2026-09-20', time: '13:00', opponent: 'Bærum' } },
-  { id: 'team3', number: 3, name: 'Team 3', formation: '7v7', nextGame: { date: '2026-09-21', time: '17:30', opponent: 'Lyn' } },
-]
+export const DEFAULT_FORMATS = {
+  '7v7': { id: '7v7', label: '7v7', nextGame: { date: '2026-09-21', time: '17:30', opponent: 'Lyn' } },
+  '9v9': { id: '9v9', label: '9v9', nextGame: { date: '2026-09-20', time: '13:00', opponent: 'Bærum' } },
+}
 
 export function clone(value) {
   return JSON.parse(JSON.stringify(value))
@@ -41,9 +40,7 @@ function validPlan(plan) {
 function ensurePlayerBands(plan, formation) {
   if (!plan?.players) return
   for (const player of plan.players) {
-    if (!ROLE_BANDS.includes(player.roleBand)) {
-      player.roleBand = defaultRoleBand(formation, player.number)
-    }
+    if (!ROLE_BANDS.includes(player.roleBand)) player.roleBand = defaultRoleBand(formation, player.number)
   }
 }
 
@@ -59,12 +56,10 @@ export function createPlan(sourceData, formation, strategy) {
 
 function ensureFormationTemplates(next, oldVersion) {
   const needsFormationMigration = oldVersion < 2
-
   for (const key of FORMATION_KEYS) {
     const reference = seedData[key]
     if (!next[key]) next[key] = clone(reference)
     if (!reference) continue
-
     if (needsFormationMigration) {
       next[key].shape = reference.shape
       for (const referencePlayer of reference.players) {
@@ -78,25 +73,30 @@ function ensureFormationTemplates(next, oldVersion) {
   }
 }
 
-function ensureTeamTactics(team, sourceData) {
-  team.tactics = team.tactics || {}
-
-  for (const formation of FORMATION_KEYS) {
-    team.tactics[formation] = team.tactics[formation] || {}
-    for (const strategy of STRATEGY_KEYS) {
-      if (!validPlan(team.tactics[formation][strategy])) {
-        team.tactics[formation][strategy] = createPlan(sourceData, formation, strategy)
-      }
-      ensurePlayerBands(team.tactics[formation][strategy], formation)
-    }
+function legacyProfile(next, formation) {
+  const teams = Array.isArray(next.teams) ? next.teams : []
+  const preferredId = formation === '7v7' ? 'team3' : 'team2'
+  const team = teams.find(item => item.id === preferredId && item.formation === formation)
+    || teams.find(item => item.formation === formation)
+  if (!team) return null
+  return {
+    nextGame: clone(team.nextGame || {}),
+    strategyVisibility: clone(team.strategyVisibility || {}),
+    tactics: clone(team.tactics?.[formation] || {}),
   }
 }
 
-function applyCoachBriefMigration(team, oldBriefVersion) {
-  if (oldBriefVersion >= COACH_BRIEF_VERSION) return
-  for (const formation of FORMATION_KEYS) {
-    applyCoachBriefToPlan(team.tactics?.[formation]?.standard, formation)
+function ensureFormatProfile(profile, next, formation) {
+  profile.tactics = profile.tactics || {}
+  for (const strategy of STRATEGY_KEYS) {
+    if (!validPlan(profile.tactics[strategy])) profile.tactics[strategy] = createPlan(next, formation, strategy)
+    ensurePlayerBands(profile.tactics[strategy], formation)
   }
+}
+
+function applyCoachBriefMigration(profile, formation, oldBriefVersion) {
+  if (oldBriefVersion >= COACH_BRIEF_VERSION) return
+  applyCoachBriefToPlan(profile.tactics?.standard, formation)
 }
 
 export function migrateRemote(remote) {
@@ -106,29 +106,42 @@ export function migrateRemote(remote) {
 
   ensureFormationTemplates(next, oldVersion)
 
-  const existingTeams = new Map((next.teams || []).map(team => [team.id, team]))
-  next.teams = DEFAULT_TEAMS.map(defaultTeam => {
-    const existing = existingTeams.get(defaultTeam.id) || {}
-    const team = {
-      ...clone(defaultTeam),
-      ...existing,
-      number: existing.number || defaultTeam.number,
-      nextGame: { ...defaultTeam.nextGame, ...(existing.nextGame || {}) },
+  const existingFormats = next.formats || {}
+  const formats = {}
+  for (const formation of FORMATION_KEYS) {
+    const defaults = DEFAULT_FORMATS[formation]
+    const legacy = legacyProfile(next, formation) || {}
+    const existing = existingFormats[formation] || {}
+    const formationFallbackVisibility = next[formation]?.strategyVisibility || DEFAULT_VISIBILITY
+
+    const profile = {
+      ...clone(defaults),
+      ...clone(legacy),
+      ...clone(existing),
+      id: formation,
+      label: formation,
+      nextGame: {
+        ...clone(defaults.nextGame),
+        ...(legacy.nextGame || {}),
+        ...(existing.nextGame || {}),
+      },
+      strategyVisibility: {
+        ...DEFAULT_VISIBILITY,
+        ...formationFallbackVisibility,
+        ...(legacy.strategyVisibility || {}),
+        ...(existing.strategyVisibility || {}),
+      },
+      tactics: clone(existing.tactics || legacy.tactics || {}),
     }
 
-    const formationFallbackVisibility = next[team.formation]?.strategyVisibility || DEFAULT_VISIBILITY
-    team.strategyVisibility = {
-      ...DEFAULT_VISIBILITY,
-      ...formationFallbackVisibility,
-      ...(existing.strategyVisibility || {}),
-    }
+    ensureFormatProfile(profile, next, formation)
+    applyCoachBriefMigration(profile, formation, oldBriefVersion)
+    formats[formation] = profile
+  }
 
-    ensureTeamTactics(team, next)
-    applyCoachBriefMigration(team, oldBriefVersion)
-    return team
-  })
-
+  next.formats = formats
+  delete next.teams
   next.coachBriefVersion = COACH_BRIEF_VERSION
-  next.version = Math.max(oldVersion, 6)
+  next.version = Math.max(oldVersion, 9)
   return next
 }
