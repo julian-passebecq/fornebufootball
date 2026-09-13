@@ -1,4 +1,4 @@
-/* V14: keep the red team warning directly below the right strategy panel. */
+/* V14: public red warning under the right strategy panel; coach red rule stays under the pitch. */
 .workspace-grid{position:relative}
 
 .rule-below-sidebar{
@@ -24,35 +24,200 @@
   line-height:1.25;
 }
 
-.rule-below-sidebar .compact-rule-editor{
-  margin:0!important;
-  width:100%;
-  box-sizing:border-box;
-}
-
-.rule-below-sidebar .compact-rule-editor textarea{
-  width:100%;
-  box-sizing:border-box;
-}
-
 /* Give the tactical categories a little more breathing room in both team and player views. */
 .strategy-sidebar .global-sections{gap:13px!important}
 .strategy-sidebar .player-topics{gap:11px!important}
 
-/* Drop IN / OUT a few pixels farther below the pitch for cleaner vertical rhythm. */
+/* Drop IN / OUT slightly farther below the pitch for cleaner vertical rhythm. */
 .board-card .principles-panel{
   margin-top:14px!important;
   margin-bottom:0!important;
 }
 
-@media(max-width:980px){
-  .rule-below-sidebar{
-    position:static;
-    grid-column:1;
-    width:100%;
-    margin-top:12px;
+/* Public players see the selected 7v7 / 9v9 format again at the top-left of the board. */
+.public-shell .v9-board-heading>.board-format-pill{
+  visibility:visible!important;
+  pointer-events:auto!important;
+  opacity:1!important;
+  background:#edf9fd!important;
+  border-color:#c4e4f0!important;
+  color:#155f7d!important;
+}
+
+/* Clear red entry to the private coach workspace. */
+.coach-entry-v14{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:36px;
+  padding:8px 13px;
+  border-radius:10px;
+  background:#d94b4b;
+  border:1px solid #c83f3f;
+  color:#fff;
+  text-decoration:none;
+  font-size:11px;
+  font-weight:950;
+  letter-spacing:.055em;
+  box-shadow:0 3px 10px rgba(217,75,75,.18);
+}
+.coach-entry-v14:hover{background:#c94141}
+
+/* Coach header is French-only: remove redundant public/logout controls and make status obvious. */
+.coach-shell .header-link,
+.coach-shell .signout-button{display:none!important}
+.coach-shell .coach-badge{
+  background:#d94b4b!important;
+  color:#fff!important;
+  border-color:#c83f3f!important;
+  box-shadow:0 3px 10px rgba(217,75,75,.16)!important;
+}
+.coach-shell .v10-lang-switch{
+  display:block!important;
+  background:transparent!important;
+  padding:0!important;
+}
+.coach-shell .v10-lang-switch button{display:none!important}
+.coach-shell .v10-lang-switch button.active{
+  display:block!important;
+  background:#d94b4b!important;
+  color:#fff!important;
+  border:1px solid #c83f3f!important;
+  box-shadow:0 3px 10px rgba(217,75,75,.16)!important;
+}
+
+/* Login page also makes the French-only editing rule explicit. */
+.coach-gate-page .gate-language button{display:none!important}
+.coach-gate-page .gate-language button.active{
+  display:block!important;
+  background:#d94b4b!important;
+  color:#fff!important;
+  border-color:#c83f3f!important;
+}
+.coach-gate-page .gate-public-link{display:none!important}
+
+/* In Coach mode the team rule is edited directly below the football visual and clearly red. */
+.coach-shell .board-card .coach-principles{
+  margin-top:16px!important;
+}
+.coach-shell .board-card .compact-rule-editor{
+  margin-top:14px!important;
+  padding:10px 12px!important;
+  border:1px solid #efc4c4!important;
+  border-radius:11px!important;
+  background:#fff7f7!important;
+}
+.coach-shell .board-card .compact-rule-editor>span{
+  color:#d94b4b!important;
+  font-size:10px!important;
+  font-weight:950!important;
+  letter-spacing:.07em!important;
+}
+.coach-shell .board-card .compact-rule-editor textarea{
+  width:100%!important;
+  box-sizing:border-box!important;
+  border-color:#e7b4b4!important;
+  background:#fff!important;
+  color:#7e2e2e!important;
+}
+
+/* Tablet / iPad: stack pitch and instructions instead of squeezing both columns. */
+@media(max-width:1180px){
+  main{padding:14px!important}
+  .workspace-grid{
+    grid-template-columns:1fr!important;
+    gap:14px!important;
   }
-  .strategy-sidebar .global-sections{gap:11px!important}
-  .strategy-sidebar .player-topics{gap:10px!important}
+  .strategy-sidebar{
+    position:static!important;
+    top:auto!important;
+    max-height:none!important;
+    min-height:0!important;
+    overflow:visible!important;
+  }
+  .rule-below-sidebar{
+    position:static!important;
+    grid-column:1!important;
+    width:100%!important;
+    margin-top:0!important;
+  }
+  .public-shell .global-sections,
+  .public-shell .player-topics{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:12px!important;
+  }
+  .coach-shell .coach-footer{
+    position:sticky!important;
+    bottom:8px!important;
+    z-index:35!important;
+    box-shadow:0 10px 30px rgba(29,76,99,.14)!important;
+  }
+  .strategy-sidebar .global-sections{gap:12px!important}
+  .strategy-sidebar .player-topics{gap:11px!important}
+}
+
+/* Phone: larger touch targets, one-column instructions and a cleaner header. */
+@media(max-width:760px){
+  main{padding:8px!important}
+  .board-card,
+  .strategy-sidebar{padding:10px!important;border-radius:14px!important}
+
+  .v10-topbar{padding:8px 10px!important;column-gap:8px!important}
+  .v9-club-brand{gap:8px!important;min-width:0!important}
+  .v9-brand-mark{width:38px!important;height:38px!important}
+  .v9-club-brand h1{font-size:14px!important;white-space:nowrap!important}
+  .v9-club-brand span{font-size:9px!important}
+  .coach-entry-v14{min-height:34px;padding:7px 9px;font-size:10px}
+
+  .format-selector{gap:6px!important;padding:5px!important}
+  .format-selector button{min-height:48px!important}
+
+  .public-shell .v9-board-heading{
+    grid-template-columns:auto 1fr auto!important;
+    gap:7px!important;
+    min-height:54px!important;
+  }
+  .public-shell .board-format-pill{padding:6px 8px!important}
+  .public-shell .formation-center-badge{min-width:78px!important}
+  .public-shell .active-plan-pill{max-width:105px!important}
+
+  .pitch{aspect-ratio:16/10!important}
+  .public-shell .jersey{width:42px!important;height:48px!important;font-size:14px!important}
+  .public-shell .jersey:before{width:36px!important;height:40px!important}
+
+  .public-shell .global-sections,
+  .public-shell .player-topics{
+    grid-template-columns:1fr!important;
+    gap:10px!important;
+  }
+  .strategy-sidebar .strategy-block,
+  .strategy-sidebar .player-topic{padding:12px!important}
+  .strategy-toggle button{min-height:42px!important}
+
+  .in-out-row{gap:7px!important}
   .board-card .principles-panel{margin-top:12px!important}
+
+  .coach-shell .coach-footer{
+    margin-top:10px!important;
+    padding:10px!important;
+    gap:10px!important;
+    flex-wrap:wrap!important;
+  }
+  .coach-shell .publish-button{width:100%!important;min-height:44px!important}
+  .coach-shell .global-sections,
+  .coach-shell .player-topics{gap:10px!important}
+}
+
+@media(max-width:480px){
+  .v9-club-brand span{display:none!important}
+  .v9-club-brand h1{font-size:13px!important}
+  .v10-lang-switch button{min-width:30px!important;padding-inline:6px!important}
+  .coach-entry-v14{padding-inline:8px!important}
+  .public-shell .v9-board-heading{gap:5px!important}
+  .public-shell .board-format-pill strong{font-size:10px!important}
+  .public-shell .formation-center-badge{min-width:72px!important;padding-inline:7px!important}
+  .public-shell .active-plan-pill{font-size:8px!important;padding-inline:6px!important}
+  .public-shell .jersey{width:38px!important;height:44px!important}
+  .public-shell .jersey:before{width:33px!important;height:37px!important}
 }
