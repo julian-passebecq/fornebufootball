@@ -1,5 +1,7 @@
-node_modules
-dist
-.netlify
+node_modules/
+dist/
+.netlify/
 .env
 .env.*
+test-results/
+playwright-report/

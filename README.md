@@ -1,48 +1,94 @@
-# Fornebu Football Coach Board
+# Fornebu Coach Board 1.0
 
-Responsive React tactics board for **7v7** and **9v9** football coaching.
+React coaching board for 7v7 and 9v9. This release preserves the existing tactical
+content and published data while replacing the old DOM-patching UI with a native
+React implementation.
 
-## v0.2 feature set
-- Horizontal interactive football pitch
-- 7v7 / 9v9 formation switch in the top ribbon
-- Reference shapes: **7v7 = 2-3-1**, **9v9 = 3-2-3**
-- Desktop layout: roughly 2/3 pitch + 1/3 tactical sidebar
-- Clickable numbered player jerseys
-- Deselect a player to return to the global team plan
-- Two team strategies: Standard and Plan B
-- Player sidebar with position, Attack, Defend, Transition and Key cue sections
-- Norwegian / English UI and tactical text
-- Coach mode with password-protected editing
-- Drag-and-drop player positioning in coach mode
-- Inline tactical-text editing with a Publish Changes action
-- Netlify Blobs persistence API for published coach changes
-- Explicit save failure state instead of silently claiming a local-only save succeeded
-- Responsive desktop/tablet/mobile layout
+## Player view
 
-## Tactical content structure
-Each formation contains:
-- Global strategy: Build-up, Attack, Defend, Transition
-- Player plan: In possession, Out of possession, Transition, Key cue
-- Bilingual NO / EN text
-- X / Y position coordinates for every player
+Open the existing site root. There is deliberately **no coach link** on this page.
+Choose 7v7 or 9v9 in the top ribbon. The adjacent pitch-view control offers:
 
-## Google Sheet history
-Google Sheets is intentionally **not exposed in the v0.2 coach UI**. The planned role for the existing `fornebucoachv1` sheet is an archive/history layer: validated website versions can later append timestamped history records or match snapshots without forcing the coach to edit spreadsheet cells.
+- **Auto**: vertical on portrait phones/tablets, horizontal on desktop or landscape.
+- **Vertical / Horizontal**: explicit preference, remembered on the device.
 
-## Local development
-```bash
+Orientation changes only the view, not the saved positions. Shirts and labels stay
+upright. Tap a shirt for the player's shared instructions; use Back to team plan
+to return. Both Starting formation and On ball loss are always available.
+The team-level Without the ball card belongs only to On ball loss.
+
+Desktop retains the pitch/sidebar layout. Small screens stack the instructions,
+use touch-sized player targets and automatically bring a selected player's panel
+into view. The normal page scroll is used rather than a nested mobile scrollbar.
+
+## Coach workflow
+
+Open `/coach` and use the existing coach password. Every visit starts in French.
+The header contains one green **VALIDER** button, then red **FR**, then EN / NO.
+English and Norwegian are read-only previews. Existing translations are retained;
+French edits are **not automatically translated**.
+
+1. Choose a game format and tactical phase.
+2. Drag a shirt, or tap it and use the four position arrows. A keyboard user can
+   focus a shirt and use arrow keys; Shift makes a larger move.
+3. To change a shirt number, enter 1-99 and select **Appliquer**. If the number is
+   already used, an explicit **Échanger** action swaps the two shirt numbers.
+4. Edit the French role or player instructions. Player information is shared
+   across phases; coordinates are phase-specific. The other game format is separate.
+5. Select **VALIDER** to publish all current changes. A success message appears
+   only after the API confirms the write. Errors remain visible and drafts remain
+   available. **Annuler** restores the previous local edit.
+
+Choosing a ball-loss preset replaces that phase's coordinates, not shirt numbers
+or player guidance. A customized shape requires confirmation before resetting.
+The red team-rule editor is below the coach's pitch; the player-facing warning is
+below the instruction panel.
+
+Unpublished drafts are stored in session storage when available. A refresh can
+restore a draft against the same published baseline. Drafts are never published
+implicitly, and a failed initial load disables editing/publishing instead of
+allowing the example data to overwrite a real plan.
+
+## Source of truth and compatibility
+
+Active UI: `src/main.jsx` -> `src/AppBoard.jsx`, `src/board.css`, `src/boardCopy.js`.
+State operations and coordinate transforms: `src/boardModel.js`.
+Existing migration/content modules remain unchanged and are reused.
+`AppV*` and `v*.css` files are retained as historical snapshots, not imported by the
+current UI. Do not add another DOM observer or CSS override layer to them.
+
+A player's original `number` is a stable internal tactical slot, used by legacy
+presets and saved coordinates. New editable `shirtNumber` is the displayed jersey
+number. Never use an editable shirt number as a React key or preset lookup key.
+
+Publishing keeps the existing `/api/tactics` payload compatible, including both
+legacy format templates and `formats.*.tactics`. The Netlify authentication and
+storage endpoints are not replaced in this release.
+
+## Development and verification
+
+Use Node 22.16 or newer. Dependency versions are pinned.
+
+```sh
 npm install
+npm test
+npm run build
+npx playwright install --with-deps chromium webkit
+npm run test:e2e
 npm run dev
 ```
 
-## Tests
-```bash
-npm test
-```
+GitHub Actions runs model/handler tests, a production build and the browser suite.
+Browser tests cover desktop Chromium, iPhone-sized WebKit, iPad portrait WebKit and
+iPad landscape Chromium. API responses are mocked: tests do not use the coach's
+password, alter production tactics or prove a live Netlify save succeeded.
+Screenshots, traces, HTML report and JSON results are uploaded as workflow evidence.
+The server contract tests execute the real handlers with an in-memory platform
+adapter, including authorization and publish/reload checks.
 
-## Production variables
-Set these in Netlify before enabling Coach mode:
-- `COACH_PASSWORD`
-- `COACH_SESSION_SECRET` — use a long random value
+## Deployment
 
-Published edits are stored through Netlify Blobs. The website is the working interface and live source of truth.
+The existing Netlify project builds `main` using `npm run build` and publishes
+`dist`; functions remain under `netlify/functions`. Retain the existing
+`COACH_PASSWORD` and `COACH_SESSION_SECRET` environment variables. Do not put
+secrets or unpublished player information in the repository.
