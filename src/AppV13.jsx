@@ -6,19 +6,16 @@ const copy = {
   EN: {
     standard: 'Starting formation',
     alternative: 'On ball loss',
-    withoutBall: 'Without the ball',
     counterShape: 'Ball-loss shape',
   },
   FR: {
     standard: 'Formation de jeu de départ',
     alternative: 'À la perte de balle',
-    withoutBall: 'Sans ballon',
     counterShape: 'Structure à la perte de balle',
   },
   NO: {
     standard: 'Startformasjon',
     alternative: 'Ved balltap',
-    withoutBall: 'Uten ball',
     counterShape: 'Form ved balltap',
   },
 }
@@ -56,14 +53,8 @@ export default function AppV13() {
       const presetTitle = root.querySelector('.counterpress-preset-head > span')
       if (presetTitle) setText(presetTitle, t.counterShape)
 
-      const alternativeActive = Boolean(root.querySelector('.active-plan-pill.alternative'))
-      if (alternativeActive) {
-        const playerTopics = root.querySelectorAll('.player-topic-head span:last-child')
-        if (playerTopics[1]) setText(playerTopics[1], t.withoutBall)
-      }
-
       // Starting formation describes the team's initial in-possession structure.
-      // Keep "Without the ball" only in the dedicated ball-loss strategy.
+      // Keep "Without the ball" only in the dedicated ball-loss team strategy.
       const standardActive = Boolean(root.querySelector('.active-plan-pill.standard'))
       root.querySelectorAll('.global-sections .strategy-block').forEach(block => {
         const label = block.querySelector('.strategy-label span:last-child')?.textContent || ''
