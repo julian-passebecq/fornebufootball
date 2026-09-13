@@ -1,0 +1,7 @@
+.orientation-control{margin-left:16px!important;position:relative}
+.orientation-control>select{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important;overflow:hidden!important}
+.orientation-v16-buttons{display:flex;align-items:center;gap:3px;border-left:1px solid #d4e7ee;padding-left:7px;margin-left:3px}
+.orientation-v16-buttons button{border:1px solid transparent;background:transparent;color:#5c7783;border-radius:8px;min-height:34px;padding:6px 9px;font-size:11px;font-weight:800;cursor:pointer}
+.orientation-v16-buttons button.active{background:#eaf7fc;color:#155f7d;border-color:#9fd4e8;box-shadow:0 2px 7px rgba(47,159,208,.12)}
+@media(max-width:760px){.orientation-control{margin-left:10px!important}.orientation-v16-buttons{padding-left:5px}.orientation-v16-buttons button{min-height:38px;padding:7px 8px;font-size:10px}}
+@media(max-width:420px){.orientation-control{margin-left:6px!important}.orientation-v16-buttons button{padding-inline:6px;min-width:0}.orientation-control svg{display:none}}
