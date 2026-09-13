@@ -44,49 +44,87 @@
   color:#155f7d!important;
 }
 
-/* Clear red entry to the private coach workspace. */
-.coach-entry-v14{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  min-height:36px;
-  padding:8px 13px;
-  border-radius:10px;
-  background:#d94b4b;
-  border:1px solid #c83f3f;
-  color:#fff;
-  text-decoration:none;
-  font-size:11px;
-  font-weight:950;
-  letter-spacing:.055em;
-  box-shadow:0 3px 10px rgba(217,75,75,.18);
-}
-.coach-entry-v14:hover{background:#c94141}
+/* Legacy coach-entry class is never shown on the student page. */
+.coach-entry-v14{display:none!important}
 
-/* Coach header is French-only: remove redundant public/logout controls and make status obvious. */
+/* Coach header: French is the editing language; EN/NO remain available as read-only previews. */
 .coach-shell .header-link,
-.coach-shell .signout-button{display:none!important}
-.coach-shell .coach-badge{
+.coach-shell .signout-button,
+.coach-shell .coach-badge{display:none!important}
+
+.coach-shell .v9-header-actions{
+  display:flex!important;
+  align-items:center!important;
+  gap:12px!important;
+}
+.coach-shell .v10-lang-switch{
+  display:flex!important;
+  align-items:center!important;
+  gap:5px!important;
+  background:transparent!important;
+  padding:0!important;
+}
+.coach-shell .v10-lang-switch button{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-width:36px!important;
+  min-height:34px!important;
+  padding:7px 9px!important;
+  border-radius:9px!important;
+  border:1px solid #d4e7ee!important;
+  background:#fff!important;
+  color:#315d70!important;
+  box-shadow:none!important;
+}
+/* FR first, always red; EN and NO sit together after a clear gap. */
+.coach-shell .v10-lang-switch button:nth-child(2){
+  order:1!important;
+  margin-right:9px!important;
   background:#d94b4b!important;
   color:#fff!important;
   border-color:#c83f3f!important;
   box-shadow:0 3px 10px rgba(217,75,75,.16)!important;
 }
-.coach-shell .v10-lang-switch{
-  display:block!important;
-  background:transparent!important;
-  padding:0!important;
-}
-.coach-shell .v10-lang-switch button{display:none!important}
-.coach-shell .v10-lang-switch button.active{
-  display:block!important;
-  background:#d94b4b!important;
-  color:#fff!important;
-  border:1px solid #c83f3f!important;
-  box-shadow:0 3px 10px rgba(217,75,75,.16)!important;
+.coach-shell .v10-lang-switch button:nth-child(1){order:2!important}
+.coach-shell .v10-lang-switch button:nth-child(3){order:3!important}
+.coach-shell .v10-lang-switch button:nth-child(1).active,
+.coach-shell .v10-lang-switch button:nth-child(3).active{
+  background:#eaf7fc!important;
+  color:#155f7d!important;
+  border-color:#9fd4e8!important;
+  box-shadow:0 2px 7px rgba(47,159,208,.12)!important;
 }
 
-/* Login page also makes the French-only editing rule explicit. */
+/* Green validate action replaces the passive Espace coach badge. */
+.coach-validate-v14{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:36px;
+  padding:8px 14px;
+  border-radius:10px;
+  border:1px solid #2e8b57;
+  background:#38a866;
+  color:#fff;
+  font:inherit;
+  font-size:11px;
+  font-weight:950;
+  letter-spacing:.045em;
+  cursor:pointer;
+  box-shadow:0 3px 10px rgba(56,168,102,.2);
+}
+.coach-validate-v14:hover{background:#31965b}
+
+/* EN / NO are preview-only in Coach mode: text stays visible but cannot be changed. */
+.coach-preview-readonly{
+  background:#f4f8fa!important;
+  color:#60747d!important;
+  border-color:#d8e5ea!important;
+  cursor:not-allowed!important;
+}
+
+/* Login page opens in French; no language clutter before authentication. */
 .coach-gate-page .gate-language button{display:none!important}
 .coach-gate-page .gate-language button.active{
   display:block!important;
@@ -95,6 +133,10 @@
   border-color:#c83f3f!important;
 }
 .coach-gate-page .gate-public-link{display:none!important}
+
+/* Keep the two counter-press preset choices compact: name + shape only, plus Recommended. */
+.coach-shell .counterpress-preset-options>button>small{display:none!important}
+.coach-shell .counterpress-preset-options>button{min-height:72px!important}
 
 /* In Coach mode the team rule is edited directly below the football visual and clearly red. */
 .coach-shell .board-card .coach-principles{
@@ -168,7 +210,6 @@
   .v9-brand-mark{width:38px!important;height:38px!important}
   .v9-club-brand h1{font-size:14px!important;white-space:nowrap!important}
   .v9-club-brand span{font-size:9px!important}
-  .coach-entry-v14{min-height:34px;padding:7px 9px;font-size:10px}
 
   .format-selector{gap:6px!important;padding:5px!important}
   .format-selector button{min-height:48px!important}
@@ -198,6 +239,12 @@
   .in-out-row{gap:7px!important}
   .board-card .principles-panel{margin-top:12px!important}
 
+  .coach-shell .v9-header-actions{gap:7px!important}
+  .coach-shell .v10-lang-switch{gap:4px!important}
+  .coach-shell .v10-lang-switch button{min-width:32px!important;padding-inline:7px!important}
+  .coach-shell .v10-lang-switch button:nth-child(2){margin-right:6px!important}
+  .coach-validate-v14{min-height:34px;padding:7px 10px;font-size:10px}
+
   .coach-shell .coach-footer{
     margin-top:10px!important;
     padding:10px!important;
@@ -213,11 +260,11 @@
   .v9-club-brand span{display:none!important}
   .v9-club-brand h1{font-size:13px!important}
   .v10-lang-switch button{min-width:30px!important;padding-inline:6px!important}
-  .coach-entry-v14{padding-inline:8px!important}
   .public-shell .v9-board-heading{gap:5px!important}
   .public-shell .board-format-pill strong{font-size:10px!important}
   .public-shell .formation-center-badge{min-width:72px!important;padding-inline:7px!important}
   .public-shell .active-plan-pill{font-size:8px!important;padding-inline:6px!important}
   .public-shell .jersey{width:38px!important;height:44px!important}
   .public-shell .jersey:before{width:33px!important;height:37px!important}
+  .coach-shell .v9-header-actions{flex-wrap:wrap!important;justify-content:flex-end!important}
 }
