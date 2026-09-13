@@ -14,7 +14,6 @@ export default function AppV14() {
       const coachRoute = cleanPath === '/coach'
       const coachShell = root.querySelector('.coach-shell')
       const coachGate = root.querySelector('.coach-gate-page')
-      const publicShell = root.querySelector('.public-shell')
 
       // Coach edits are French-only. Force FR on the login screen and inside the workspace.
       if (coachRoute) {
@@ -26,16 +25,8 @@ export default function AppV14() {
         if (frButton && !frButton.classList.contains('active')) frButton.click()
       }
 
-      // Public view keeps a clear red entry point to the private coach workspace.
-      const publicActions = publicShell?.querySelector('.v9-header-actions')
-      if (publicActions && !publicActions.querySelector('.coach-entry-v14')) {
-        const link = document.createElement('a')
-        link.className = 'coach-entry-v14'
-        link.href = '/coach'
-        link.textContent = 'COACH'
-        link.setAttribute('aria-label', 'Open coach workspace')
-        publicActions.appendChild(link)
-      }
+      // Coach access stays private via /coach. Never expose a coach button on the student page.
+      root.querySelectorAll('.coach-entry-v14').forEach(node => node.remove())
     }
 
     function positionRule() {
