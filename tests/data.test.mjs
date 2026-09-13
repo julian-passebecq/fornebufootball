@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { seedData } from '../src/seedData.js'
 import { COACH_BRIEF_VERSION } from '../src/coachBriefV8.js'
-import { migrateRemote, ROLE_BANDS } from '../src/tacticsModel.js'
+import { migrateRemote, ROLE_BANDS, ROLE_COLORS, SKY_BLUE_PLAYER } from '../src/tacticsModel.js'
 
 test('7v7 has seven numbered players',()=>{assert.equal(seedData['7v7'].players.length,7);assert.deepEqual(seedData['7v7'].players.map(p=>p.number),[1,2,3,4,5,6,7])})
 test('9v9 has nine numbered players',()=>{assert.equal(seedData['9v9'].players.length,9);assert.deepEqual(seedData['9v9'].players.map(p=>p.number),[1,2,3,4,5,6,7,8,9])})
@@ -11,7 +11,7 @@ test('player positions remain in pitch bounds',()=>{for(const f of ['7v7','9v9']
 
 test('migration creates exactly two format profiles',()=>{
   const data=migrateRemote(seedData)
-  assert.equal(data.version,9)
+  assert.equal(data.version,10)
   assert.equal(data.coachBriefVersion,COACH_BRIEF_VERSION)
   assert.deepEqual(Object.keys(data.formats).sort(),['7v7','9v9'])
   assert.equal(data.teams,undefined)
@@ -46,6 +46,32 @@ test('7v7 adapts the same 9v9 source brief by role',()=>{
   assert.equal(standard.players.find(p=>p.number===7).role.en,'Striker')
 })
 
+test('French standard content exists for both formats',()=>{
+  const data=migrateRemote(seedData)
+  for(const formation of ['7v7','9v9']){
+    const standard=data.formats[formation].tactics.standard
+    assert.equal(standard.global.title.fr,'Plan standard')
+    assert.ok(standard.players.every(player=>player.role.fr && player.sections.every(section=>section.text.fr)))
+  }
+})
+
+test('all player colours are the same sky blue',()=>{
+  assert.equal(ROLE_COLORS.goalkeeper,SKY_BLUE_PLAYER)
+  assert.equal(ROLE_COLORS.defender,SKY_BLUE_PLAYER)
+  assert.equal(ROLE_COLORS.midfielder,SKY_BLUE_PLAYER)
+  assert.equal(ROLE_COLORS.attacker,SKY_BLUE_PLAYER)
+})
+
+test('both formats include the compact-block and IN/OUT principles',()=>{
+  const data=migrateRemote(seedData)
+  for(const formation of ['7v7','9v9']){
+    const principles=data.formats[formation].principles
+    assert.match(principles.compact.fr,/bloc d'équipe compact/i)
+    assert.equal(principles.in.fr,'Ouvrir le jeu')
+    assert.equal(principles.out.fr,'Jeu compact')
+  }
+})
+
 test('standard and additional positions are independent',()=>{
   const data=migrateRemote(seedData)
   for(const formation of ['7v7','9v9']){
@@ -65,11 +91,13 @@ test('standard and additional player text is independent',()=>{
 test('coach edits survive a later migration',()=>{
   const first=migrateRemote(seedData)
   first.formats['9v9'].tactics.standard.players[0].sections[0].text.en='Coach custom goalkeeper instruction'
+  first.formats['9v9'].principles.compact.en='Coach custom compact rule'
   const second=migrateRemote(first)
   assert.equal(second.formats['9v9'].tactics.standard.players[0].sections[0].text.en,'Coach custom goalkeeper instruction')
+  assert.equal(second.formats['9v9'].principles.compact.en,'Coach custom compact rule')
 })
 
-test('all format players receive a valid role colour band',()=>{
+test('all format players keep a valid tactical role band',()=>{
   const data=migrateRemote(seedData)
   for(const formation of ['7v7','9v9']){
     for(const strategy of ['standard','alternative']){
