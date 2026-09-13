@@ -1,5 +1,5 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './AppV14'
+import App from './AppBoard.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(<React.StrictMode><App /></React.StrictMode>)
