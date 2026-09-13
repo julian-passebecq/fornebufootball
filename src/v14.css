@@ -58,6 +58,7 @@
   gap:12px!important;
 }
 .coach-shell .v10-lang-switch{
+  order:2!important;
   display:flex!important;
   align-items:center!important;
   gap:5px!important;
@@ -96,8 +97,9 @@
   box-shadow:0 2px 7px rgba(47,159,208,.12)!important;
 }
 
-/* Green validate action replaces the passive Espace coach badge. */
+/* One save action only: green VALIDER sits immediately to the left of FR. */
 .coach-validate-v14{
+  order:1!important;
   display:inline-flex;
   align-items:center;
   justify-content:center;
@@ -115,6 +117,9 @@
   box-shadow:0 3px 10px rgba(56,168,102,.2);
 }
 .coach-validate-v14:hover{background:#31965b}
+
+/* The old bottom coach footer/publish action is redundant now that VALIDER publishes. */
+.coach-shell .coach-footer{display:none!important}
 
 /* EN / NO are preview-only in Coach mode: text stays visible but cannot be changed. */
 .coach-preview-readonly{
@@ -189,12 +194,6 @@
     grid-template-columns:repeat(2,minmax(0,1fr))!important;
     gap:12px!important;
   }
-  .coach-shell .coach-footer{
-    position:sticky!important;
-    bottom:8px!important;
-    z-index:35!important;
-    box-shadow:0 10px 30px rgba(29,76,99,.14)!important;
-  }
   .strategy-sidebar .global-sections{gap:12px!important}
   .strategy-sidebar .player-topics{gap:11px!important}
 }
@@ -245,13 +244,6 @@
   .coach-shell .v10-lang-switch button:nth-child(2){margin-right:6px!important}
   .coach-validate-v14{min-height:34px;padding:7px 10px;font-size:10px}
 
-  .coach-shell .coach-footer{
-    margin-top:10px!important;
-    padding:10px!important;
-    gap:10px!important;
-    flex-wrap:wrap!important;
-  }
-  .coach-shell .publish-button{width:100%!important;min-height:44px!important}
   .coach-shell .global-sections,
   .coach-shell .player-topics{gap:10px!important}
 }
