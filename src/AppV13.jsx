@@ -7,16 +7,19 @@ const copy = {
     standard: 'Starting formation',
     alternative: 'On ball loss',
     counterShape: 'Ball-loss shape',
+    sharedPlayerHint: 'Positions are saved per tactical phase; player instructions are shared.',
   },
   FR: {
     standard: 'Formation de jeu de départ',
     alternative: 'À la perte de balle',
     counterShape: 'Structure à la perte de balle',
+    sharedPlayerHint: 'Les positions sont enregistrées par phase tactique ; les consignes joueur sont partagées.',
   },
   NO: {
     standard: 'Startformasjon',
     alternative: 'Ved balltap',
     counterShape: 'Form ved balltap',
+    sharedPlayerHint: 'Posisjonene lagres per taktisk fase; spillerinstruksjonene er felles.',
   },
 }
 
@@ -52,6 +55,10 @@ export default function AppV13() {
 
       const presetTitle = root.querySelector('.counterpress-preset-head > span')
       if (presetTitle) setText(presetTitle, t.counterShape)
+
+      if (root.querySelector('.coach-shell')) {
+        setText(root.querySelector('.pitch-footer-hint'), t.sharedPlayerHint)
+      }
 
       // Starting formation describes the team's initial in-possession structure.
       // Keep "Without the ball" only in the dedicated ball-loss team strategy.
