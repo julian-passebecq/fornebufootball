@@ -15,18 +15,43 @@ export default function AppV14() {
       const coachShell = root.querySelector('.coach-shell')
       const coachGate = root.querySelector('.coach-gate-page')
 
-      // Coach edits are French-only. Force FR on the login screen and inside the workspace.
-      if (coachRoute) {
+      // Coach opens in French by default, but can preview EN / NO.
+      if (coachRoute && !sessionStorage.getItem('fornebu-coach-language-initialized')) {
         const frButton = coachShell
           ? root.querySelector('.coach-shell .v10-lang-switch button:nth-child(2)')
           : coachGate
             ? root.querySelector('.coach-gate-page .gate-language button:nth-child(2)')
             : null
         if (frButton && !frButton.classList.contains('active')) frButton.click()
+        if (frButton) sessionStorage.setItem('fornebu-coach-language-initialized', '1')
       }
 
       // Coach access stays private via /coach. Never expose a coach button on the student page.
       root.querySelectorAll('.coach-entry-v14').forEach(node => node.remove())
+
+      if (coachShell) {
+        const headerActions = coachShell.querySelector('.v9-header-actions')
+        const langButtons = coachShell.querySelectorAll('.v10-lang-switch button')
+        const activeLang = Array.from(langButtons).find(button => button.classList.contains('active'))?.textContent?.trim() || 'FR'
+        const frenchEditing = activeLang === 'FR'
+
+        // EN / NO are preview modes only. Text editing is enabled only in French.
+        coachShell.querySelectorAll('.editable-field textarea, .coach-principles textarea, .coach-principles input').forEach(field => {
+          field.readOnly = !frenchEditing
+          field.classList.toggle('coach-preview-readonly', !frenchEditing)
+        })
+
+        // Replace the passive "Espace coach" badge with a clear green Validate action.
+        coachShell.querySelectorAll('.coach-badge').forEach(node => { node.style.display = 'none' })
+        if (headerActions && !headerActions.querySelector('.coach-validate-v14')) {
+          const validate = document.createElement('button')
+          validate.type = 'button'
+          validate.className = 'coach-validate-v14'
+          validate.textContent = 'VALIDER'
+          validate.addEventListener('click', () => coachShell.querySelector('.publish-button')?.click())
+          headerActions.appendChild(validate)
+        }
+      }
     }
 
     function positionRule() {
