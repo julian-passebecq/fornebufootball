@@ -1,15 +1,35 @@
 import { seedData } from './seedData.js'
 import { applyCoachBriefToPlan, COACH_BRIEF_VERSION } from './coachBriefV8.js'
+import { ensureFrenchStandard } from './frenchBriefV10.js'
 
 export const STRATEGY_KEYS = ['standard', 'alternative']
 export const FORMATION_KEYS = ['7v7', '9v9']
 export const DEFAULT_VISIBILITY = { standard: true, alternative: false }
 export const ROLE_BANDS = ['goalkeeper', 'defender', 'midfielder', 'attacker']
+export const SKY_BLUE_PLAYER = '#63c6e8'
 export const ROLE_COLORS = {
-  goalkeeper: '#2f9fd0',
-  defender: '#355f8f',
-  midfielder: '#d99b2b',
-  attacker: '#d85e5e',
+  goalkeeper: SKY_BLUE_PLAYER,
+  defender: SKY_BLUE_PLAYER,
+  midfielder: SKY_BLUE_PLAYER,
+  attacker: SKY_BLUE_PLAYER,
+}
+
+export const DEFAULT_PRINCIPLES = {
+  compact: {
+    en: 'When we lose the ball, every player must recover centrally into a compact team block.',
+    no: 'Ved balltap skal alle spillere trekke inn sentralt og samle seg i en kompakt lagblokk.',
+    fr: "À la perte de la balle, tous les joueurs doivent se recentrer en bloc d'équipe compact.",
+  },
+  in: {
+    en: 'Open the game',
+    no: 'Åpne spillet',
+    fr: 'Ouvrir le jeu',
+  },
+  out: {
+    en: 'Compact play',
+    no: 'Kompakt spill',
+    fr: 'Jeu compact',
+  },
 }
 
 export const DEFAULT_FORMATS = {
@@ -95,8 +115,17 @@ function ensureFormatProfile(profile, next, formation) {
 }
 
 function applyCoachBriefMigration(profile, formation, oldBriefVersion) {
-  if (oldBriefVersion >= COACH_BRIEF_VERSION) return
-  applyCoachBriefToPlan(profile.tactics?.standard, formation)
+  if (oldBriefVersion < COACH_BRIEF_VERSION) applyCoachBriefToPlan(profile.tactics?.standard, formation)
+  ensureFrenchStandard(profile.tactics?.standard, formation)
+}
+
+function ensurePrinciples(profile) {
+  const existing = profile.principles || {}
+  profile.principles = {
+    compact: { ...DEFAULT_PRINCIPLES.compact, ...(existing.compact || {}) },
+    in: { ...DEFAULT_PRINCIPLES.in, ...(existing.in || {}) },
+    out: { ...DEFAULT_PRINCIPLES.out, ...(existing.out || {}) },
+  }
 }
 
 export function migrateRemote(remote) {
@@ -132,16 +161,18 @@ export function migrateRemote(remote) {
         ...(existing.strategyVisibility || {}),
       },
       tactics: clone(existing.tactics || legacy.tactics || {}),
+      principles: clone(existing.principles || {}),
     }
 
     ensureFormatProfile(profile, next, formation)
     applyCoachBriefMigration(profile, formation, oldBriefVersion)
+    ensurePrinciples(profile)
     formats[formation] = profile
   }
 
   next.formats = formats
   delete next.teams
   next.coachBriefVersion = COACH_BRIEF_VERSION
-  next.version = Math.max(oldVersion, 9)
+  next.version = Math.max(oldVersion, 10)
   return next
 }
