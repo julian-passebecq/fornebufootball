@@ -112,15 +112,17 @@ test('all format players keep a valid tactical role band',()=>{
   }
 })
 
-test('V12 exposes Standard and Counter-press to players by default',()=>{
+test('V13 exposes starting formation and ball-loss plan to players by default',()=>{
   const data=prepareCounterPressData(migrateRemote(seedData))
   for(const formation of ['7v7','9v9']){
     assert.equal(data.formats[formation].strategyVisibility.standard,true)
     assert.equal(data.formats[formation].strategyVisibility.alternative,true)
+    assert.equal(data.formats[formation].tactics.standard.global.title.fr,'Formation de jeu de départ')
+    assert.equal(data.formats[formation].tactics.alternative.global.title.fr,'À la perte de balle')
   }
 })
 
-test('each format has two researched counter-press presets and a default selection',()=>{
+test('each format has two ball-loss presets and a default selection',()=>{
   const data=prepareCounterPressData(migrateRemote(seedData))
   for(const formation of ['7v7','9v9']){
     assert.equal(COUNTERPRESS_PRESETS[formation].length,2)
@@ -129,18 +131,21 @@ test('each format has two researched counter-press presets and a default selecti
   }
 })
 
-test('counter-press plan has dedicated multilingual coaching text',()=>{
+test('ball-loss plan includes dedicated multilingual without-ball guidance',()=>{
   const data=prepareCounterPressData(migrateRemote(seedData))
   for(const formation of ['7v7','9v9']){
     const plan=data.formats[formation].tactics.alternative
-    assert.equal(plan.global.title.en,'Counter-press')
-    assert.equal(plan.global.title.fr,'Contre-pressing')
+    assert.equal(plan.global.title.en,'On ball loss')
+    assert.equal(plan.global.title.fr,'À la perte de balle')
     assert.match(plan.global.sections[0].text.en,/Closest player/i)
+    const withoutBall=plan.global.sections.find(section=>section.key==='withoutBall')
+    assert.equal(withoutBall.label.fr,'Sans ballon')
+    assert.match(withoutBall.text.en,/stay connected/i)
     assert.ok(plan.players.every(player=>player.sections.every(section=>section.text.en&&section.text.fr&&section.text.no)))
   }
 })
 
-test('counter-press preset positions differ from Standard and can be switched without moving Standard',()=>{
+test('ball-loss preset positions differ from starting formation and can be switched independently',()=>{
   const data=prepareCounterPressData(migrateRemote(seedData))
   const formation='9v9'
   const standardBefore=data.formats[formation].tactics.standard.players.map(player=>[player.number,player.x,player.y])
