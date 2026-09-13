@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { seedData } from '../src/seedData.js'
 import { COACH_BRIEF_VERSION } from '../src/coachBriefV8.js'
-import { migrateRemote, ROLE_BANDS, ROLE_COLORS, SKY_BLUE_PLAYER } from '../src/tacticsModel.js'
+import { clone, migrateRemote, ROLE_BANDS, ROLE_COLORS, SKY_BLUE_PLAYER } from '../src/tacticsModel.js'
 import {
   applyCounterPressPreset,
   COUNTERPRESS_PRESETS,
@@ -87,11 +87,14 @@ test('standard and alternative positions are independent',()=>{
   }
 })
 
-test('standard and alternative player text is independent',()=>{
-  const data=migrateRemote(seedData)
-  const before=data.formats['9v9'].tactics.alternative.players[0].sections[0].text.en
-  data.formats['9v9'].tactics.standard.players[0].sections[0].text.en='Changed only in standard'
-  assert.equal(data.formats['9v9'].tactics.alternative.players[0].sections[0].text.en,before)
+test('coach working clone shares player guidance across tactical phases',()=>{
+  const prepared=prepareCounterPressData(migrateRemote(seedData))
+  const data=clone(prepared)
+  const standard=data.formats['9v9'].tactics.standard.players[0]
+  const alternative=data.formats['9v9'].tactics.alternative.players[0]
+  alternative.sections[0].text.en='Shared coach instruction'
+  assert.equal(standard.sections[0].text.en,'Shared coach instruction')
+  assert.strictEqual(standard.sections,alternative.sections)
 })
 
 test('coach edits survive a later migration',()=>{
