@@ -4,7 +4,7 @@ import { ensureFrenchStandard } from './frenchBriefV10.js'
 
 export const STRATEGY_KEYS = ['standard', 'alternative']
 export const FORMATION_KEYS = ['7v7', '9v9']
-export const DEFAULT_VISIBILITY = { standard: true, alternative: false }
+export const DEFAULT_VISIBILITY = { standard: true, alternative: true }
 export const ROLE_BANDS = ['goalkeeper', 'defender', 'midfielder', 'attacker']
 export const SKY_BLUE_PLAYER = '#63c6e8'
 export const ROLE_COLORS = {
@@ -158,7 +158,6 @@ export function migrateRemote(remote) {
     const defaults = DEFAULT_FORMATS[formation]
     const legacy = legacyProfile(next, formation) || {}
     const existing = existingFormats[formation] || {}
-    const formationFallbackVisibility = next[formation]?.strategyVisibility || DEFAULT_VISIBILITY
 
     const profile = {
       ...clone(defaults),
@@ -171,12 +170,9 @@ export function migrateRemote(remote) {
         ...(legacy.nextGame || {}),
         ...(existing.nextGame || {}),
       },
-      strategyVisibility: {
-        ...DEFAULT_VISIBILITY,
-        ...formationFallbackVisibility,
-        ...(legacy.strategyVisibility || {}),
-        ...(existing.strategyVisibility || {}),
-      },
+      // Starting formation and On ball loss are permanent player-facing strategies.
+      // Historical visibility flags are intentionally ignored.
+      strategyVisibility: { ...DEFAULT_VISIBILITY },
       tactics: clone(existing.tactics || legacy.tactics || {}),
       principles: clone(existing.principles || {}),
     }
