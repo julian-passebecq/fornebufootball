@@ -34,7 +34,7 @@
   margin-bottom:0!important;
 }
 
-/* Public players see the selected 7v7 / 9v9 format again at the top-left of the board. */
+/* Public players see the selected 7v7 / 9v9 format clearly at the top-left of the board. */
 .public-shell .v9-board-heading>.board-format-pill{
   visibility:visible!important;
   pointer-events:auto!important;
@@ -42,6 +42,14 @@
   background:#edf9fd!important;
   border-color:#c4e4f0!important;
   color:#155f7d!important;
+  padding:7px 12px!important;
+  min-width:52px!important;
+  text-align:center!important;
+}
+.public-shell .v9-board-heading>.board-format-pill strong{
+  font-size:14px!important;
+  line-height:1!important;
+  font-weight:950!important;
 }
 
 /* Legacy coach-entry class is never shown on the student page. */
@@ -240,7 +248,8 @@
     gap:7px!important;
     min-height:54px!important;
   }
-  .public-shell .board-format-pill{padding:6px 8px!important}
+  .public-shell .board-format-pill{padding:6px 9px!important}
+  .public-shell .board-format-pill strong{font-size:12px!important}
   .public-shell .formation-center-badge{min-width:78px!important}
   .public-shell .active-plan-pill{max-width:105px!important}
 
@@ -275,7 +284,7 @@
   .v9-club-brand h1{font-size:13px!important}
   .v10-lang-switch button{min-width:30px!important;padding-inline:6px!important}
   .public-shell .v9-board-heading{gap:5px!important}
-  .public-shell .board-format-pill strong{font-size:10px!important}
+  .public-shell .board-format-pill strong{font-size:12px!important}
   .public-shell .formation-center-badge{min-width:72px!important;padding-inline:7px!important}
   .public-shell .active-plan-pill{font-size:8px!important;padding-inline:6px!important}
   .public-shell .jersey{width:38px!important;height:44px!important}
