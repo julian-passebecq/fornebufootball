@@ -1,11 +1,14 @@
-/* V13/V18: clearer strategy naming + one strategy-independent player detail page.
+/* V13/V19: clearer strategy naming + one strategy-independent player detail page.
    Visual rule: Fornebu light blue / white / black only. Red is reserved for the warning below the pitch. */
 .strategy-toggle button{white-space:normal!important;line-height:1.15!important;min-height:38px!important;padding:8px 10px!important}
 .active-plan-pill{white-space:normal!important;text-align:center!important;line-height:1.15!important;max-width:210px}
-.plan-visibility-editor .visibility-name{line-height:1.15}
 
 /* Starting formation intentionally omits the team-level Without the ball card. */
 .starting-formation-hidden{display:none!important}
+
+/* Starting formation and On ball loss are permanent public strategies.
+   Coach no longer needs visibility toggles for them. */
+.coach-shell .plan-visibility-editor{display:none!important}
 
 /* Redundant format/shape context is removed. Formation stays centred above the pitch. */
 .strategy-sidebar>.sidebar-brand-row{display:none!important}
