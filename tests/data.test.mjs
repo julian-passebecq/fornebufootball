@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { seedData } from '../src/seedData.js'
-import { migrateRemote } from '../src/tacticsModel.js'
+import { migrateRemote, ROLE_BANDS } from '../src/tacticsModel.js'
 
 test('7v7 has seven numbered players',()=>{assert.equal(seedData['7v7'].players.length,7);assert.deepEqual(seedData['7v7'].players.map(p=>p.number),[1,2,3,4,5,6,7])})
 test('9v9 has nine numbered players',()=>{assert.equal(seedData['9v9'].players.length,9);assert.deepEqual(seedData['9v9'].players.map(p=>p.number),[1,2,3,4,5,6,7,8,9])})
@@ -12,6 +12,7 @@ test('player positions remain in pitch bounds',()=>{for(const f of ['7v7','9v9']
 
 test('migration creates three teams with their own tactics for both formats',()=>{
   const data=migrateRemote(seedData)
+  assert.equal(data.version,6)
   assert.equal(data.teams.length,3)
   for(const team of data.teams){
     assert.ok(team.tactics['7v7'].standard)
@@ -35,6 +36,27 @@ test('standard and additional plan player text is independent',()=>{
   const before=team.tactics['9v9'].alternative.players[0].sections[0].text.en
   team.tactics['9v9'].standard.players[0].sections[0].text.en='Changed only in standard'
   assert.equal(team.tactics['9v9'].alternative.players[0].sections[0].text.en,before)
+})
+
+test('standard and additional plan role colours are independent',()=>{
+  const data=migrateRemote(seedData)
+  const team=data.teams[1]
+  const before=team.tactics['9v9'].alternative.players[4].roleBand
+  team.tactics['9v9'].standard.players[4].roleBand='attacker'
+  assert.equal(team.tactics['9v9'].alternative.players[4].roleBand,before)
+})
+
+test('all migrated plan players receive a valid role colour band',()=>{
+  const data=migrateRemote(seedData)
+  for(const team of data.teams){
+    for(const formation of ['7v7','9v9']){
+      for(const strategy of ['standard','alternative']){
+        for(const player of team.tactics[formation][strategy].players){
+          assert.ok(ROLE_BANDS.includes(player.roleBand))
+        }
+      }
+    }
+  }
 })
 
 test('standard is public by default while additional plan stays coach-only',()=>{
