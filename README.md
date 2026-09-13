@@ -2,18 +2,21 @@
 
 Responsive React tactics board for **7v7** and **9v9** football coaching.
 
-## v0.1 feature set
+## v0.2 feature set
 - Horizontal interactive football pitch
-- 7v7 / 9v9 switch above the pitch
+- 7v7 / 9v9 formation switch in the top ribbon
+- Reference shapes: **7v7 = 2-3-1**, **9v9 = 3-2-3**
+- Desktop layout: roughly 2/3 pitch + 1/3 tactical sidebar
 - Clickable numbered player jerseys
+- Deselect a player to return to the global team plan
 - Two team strategies: Standard and Plan B
-- Global plan plus player-specific plan below the pitch
+- Player sidebar with position, Attack, Defend, Transition and Key cue sections
 - Norwegian / English UI and tactical text
 - Coach mode with password-protected editing
 - Drag-and-drop player positioning in coach mode
-- Inline tactical-text editing with a Validate Changes action
-- Netlify Blobs persistence API for validated coach changes
-- Google Sheet source link built into the UI
+- Inline tactical-text editing with a Publish Changes action
+- Netlify Blobs persistence API for published coach changes
+- Explicit save failure state instead of silently claiming a local-only save succeeded
 - Responsive desktop/tablet/mobile layout
 
 ## Tactical content structure
@@ -23,8 +26,8 @@ Each formation contains:
 - Bilingual NO / EN text
 - X / Y position coordinates for every player
 
-## Google Sheet
-The web app links to the existing `fornebucoachv1` Google Sheet. A structured 7v7/9v9 workbook draft was prepared with large coach-friendly text cells and sample content. Direct write-back to the original Google Sheet still requires an active Google Drive write connector or a server-side Google credential / Apps Script endpoint.
+## Google Sheet history
+Google Sheets is intentionally **not exposed in the v0.2 coach UI**. The planned role for the existing `fornebucoachv1` sheet is an archive/history layer: validated website versions can later append timestamped history records or match snapshots without forcing the coach to edit spreadsheet cells.
 
 ## Local development
 ```bash
@@ -42,4 +45,4 @@ Set these in Netlify before enabling Coach mode:
 - `COACH_PASSWORD`
 - `COACH_SESSION_SECRET` — use a long random value
 
-Validated edits are stored through Netlify Blobs. The Google Sheet remains the editorial source/link until live two-way Sheets synchronization is added.
+Published edits are stored through Netlify Blobs. The website is the working interface and live source of truth.
