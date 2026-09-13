@@ -27,6 +27,15 @@ jobs:
           retention-days: 7
       - name: Install
         run: npm install --no-audit --no-fund
+      - name: Offline dependency checkpoint
+        if: github.ref_name == 'fix/mobile-coach-final-20260913'
+        run: tar -czf /tmp/board-dependencies.tgz node_modules package-lock.json
+      - uses: actions/upload-artifact@v4
+        if: github.ref_name == 'fix/mobile-coach-final-20260913'
+        with:
+          name: board-dependencies
+          path: /tmp/board-dependencies.tgz
+          retention-days: 1
       - name: Unit tests
         run: npm test
       - name: Production build
