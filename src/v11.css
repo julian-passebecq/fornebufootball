@@ -1,0 +1,64 @@
+/* V11: the 7v7 / 9v9 selector belongs to the board, not the global header. */
+.v10-topbar{
+  grid-template-columns:minmax(260px,1fr) auto!important;
+  column-gap:24px!important;
+  margin-bottom:0!important;
+}
+.v10-topbar .v9-header-actions{
+  grid-column:2!important;
+  justify-self:end!important;
+}
+
+.format-selector-board-slot{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  width:100%;
+  margin:0 0 12px;
+}
+.format-selector-board-slot .format-selector{
+  position:static!important;
+  top:auto!important;
+  right:auto!important;
+  bottom:auto!important;
+  left:auto!important;
+  transform:none!important;
+  width:auto!important;
+  margin:0!important;
+  z-index:auto!important;
+}
+
+/* Keep the board metadata row directly beneath the centered selector. */
+.v11-shell .v9-board-heading,
+.v10-shell .v9-board-heading{
+  margin-top:0!important;
+}
+
+@media(max-width:1100px){
+  .v10-topbar{
+    grid-template-columns:1fr auto!important;
+    margin-bottom:0!important;
+    min-height:78px!important;
+  }
+  .format-selector-board-slot{
+    margin-bottom:10px;
+  }
+  .format-selector-board-slot .format-selector{
+    width:auto!important;
+  }
+}
+
+@media(max-width:760px){
+  .v10-topbar{margin-bottom:0!important}
+  .format-selector-board-slot{margin-bottom:8px}
+  .format-selector-board-slot .format-selector{
+    display:flex!important;
+    justify-content:center!important;
+    width:100%!important;
+    max-width:330px;
+  }
+  .format-selector-board-slot .format-selector button{
+    flex:1;
+    min-width:0!important;
+  }
+}
