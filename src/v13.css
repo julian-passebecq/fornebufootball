@@ -1,0 +1,14 @@
+/* V13: clearer strategy naming requested by the coach. */
+.strategy-toggle button{white-space:normal!important;line-height:1.15!important;min-height:38px!important;padding:8px 10px!important}
+.active-plan-pill{white-space:normal!important;text-align:center!important;line-height:1.15!important;max-width:210px}
+.plan-visibility-editor .visibility-name{line-height:1.15}
+
+/* Keep the counter-press preset chooser readable without making the sidebar feel dense. */
+.counterpress-preset-editor{padding:13px!important}
+.counterpress-preset-options{gap:10px!important}
+.counterpress-preset-options>button{padding:11px!important;min-height:108px!important}
+
+@media(max-width:760px){
+  .strategy-toggle button{font-size:10px!important;padding:7px 6px!important}
+  .counterpress-preset-options>button{min-height:0!important}
+}
