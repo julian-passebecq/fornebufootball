@@ -1,0 +1,44 @@
+:root{--ffk-player-sky:#63c6e8;--ffk-alert:#d94b4b;--ffk-in:#2689b2;--ffk-out:#244f6b}
+
+/* All players use the same coach-requested sky blue. */
+.v10-shell .v6-player-marker .jersey:before,.v10-shell .v6-sidebar-jersey:before{background:var(--ffk-player-sky)!important}
+.v10-shell .v6-player-marker.selected .jersey{filter:drop-shadow(0 0 0 #fff) drop-shadow(0 0 9px #d5f4ff) drop-shadow(0 5px 6px #173d2d55)}
+
+/* Three-language selector stays compact. */
+.v10-lang-switch{display:grid!important;grid-template-columns:repeat(3,auto)!important}
+.v10-lang-switch button{min-width:38px!important;padding-inline:10px!important}
+
+/* Principles sit directly under the pitch, before the click hint. */
+.v10-board-card{padding-bottom:10px!important}
+.principles-panel{margin:10px 5px 2px;padding:0 3px}
+.compact-rule{padding:8px 12px;border-radius:10px;border:1px solid #f0c9c9;background:#fff7f7;color:var(--ffk-alert);font-size:12px;font-weight:900;line-height:1.35;text-align:center;box-shadow:0 2px 8px #d94b4b0b}
+.in-out-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+.in-out-row>div{display:flex;align-items:center;gap:9px;padding:7px 11px;border-radius:9px;background:#f8fbfc;border:1px solid #dce9ee;font-size:11px;line-height:1.2}
+.in-out-row>div:last-child{justify-content:flex-end;text-align:right}
+.in-out-row span{display:inline-grid;place-items:center;min-width:34px;height:24px;padding:0 8px;border-radius:999px;font-size:9px;font-weight:950;letter-spacing:.08em;color:#fff}
+.principle-in span{background:var(--ffk-in)}
+.principle-out span{background:var(--ffk-out)}
+.in-out-row strong{font-size:11px;color:#2d4f60}
+.pitch-footer-hint{margin-top:8px!important}
+
+/* Coach can edit the new principles in-place and publish them with everything else. */
+.coach-principles{padding:10px;border:1px solid #c9e4ef;border-radius:12px;background:#f6fbfd}
+.coach-principles label{font-size:9px;font-weight:850;text-transform:uppercase;letter-spacing:.06em;color:#5d7c89}
+.compact-rule-editor{display:flex;flex-direction:column;gap:6px}
+.compact-rule-editor textarea{resize:vertical;min-height:54px;border:1px solid #e2bcbc;border-radius:9px;padding:9px 10px;font:inherit;font-size:11px;color:#8c3030;background:#fffafa}
+.coach-in-out-row label{display:grid;grid-template-columns:auto 1fr;grid-template-areas:'tag label' 'input input';align-items:center;gap:4px 8px;padding:8px 10px;border:1px solid #d8e8ee;border-radius:9px;background:#fff}
+.coach-in-out-row label:first-child{text-align:left}.coach-in-out-row label:last-child{text-align:right}
+.coach-in-out-row label>span{grid-area:tag}.coach-in-out-row label>small{grid-area:label;font-size:9px;color:#7b919a;text-transform:none;letter-spacing:0}.coach-in-out-row input{grid-area:input;width:100%;border:1px solid #d5e6ec;border-radius:7px;padding:7px 8px;font:inherit;font-size:11px;color:#315d70;background:#fbfdfe}
+
+/* Removing role-colour controls keeps coach mode consistent with one sky-blue kit. */
+.v10-shell .role-colour-editor{display:none!important}
+
+@media(max-width:760px){
+  .v10-lang-switch button{min-width:34px!important;padding-inline:7px!important}
+  .compact-rule{font-size:10px;padding:7px 9px}
+  .in-out-row{gap:7px}
+  .in-out-row>div{padding:6px 8px;gap:6px}
+  .in-out-row span{min-width:30px;height:22px;padding-inline:6px}
+  .in-out-row strong{font-size:10px}
+  .coach-in-out-row{grid-template-columns:1fr!important}
+}
