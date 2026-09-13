@@ -1,4 +1,5 @@
-/* V13/V14: clearer strategy naming + one strategy-independent player detail page. */
+/* V13/V15: clearer strategy naming + one strategy-independent player detail page.
+   Visual rule: Fornebu light blue / white / black only. Red is reserved for the warning below the pitch. */
 .strategy-toggle button{white-space:normal!important;line-height:1.15!important;min-height:38px!important;padding:8px 10px!important}
 .active-plan-pill{white-space:normal!important;text-align:center!important;line-height:1.15!important;max-width:210px}
 .plan-visibility-editor .visibility-name{line-height:1.15}
@@ -16,10 +17,66 @@
 .strategy-sidebar:has(.player-sidebar-head){padding-top:18px!important}
 .strategy-sidebar:has(.player-sidebar-head) .player-sidebar-head{margin-top:0!important;padding-top:0!important}
 
-/* Keep the counter-press preset chooser readable without making the sidebar feel dense. */
-.counterpress-preset-editor{padding:13px!important}
+/* Keep the ball-loss preset chooser readable without making the sidebar feel dense. */
+.counterpress-preset-editor{padding:13px!important;border-color:#cfe5ee!important;background:#f8fcfe!important}
 .counterpress-preset-options{gap:10px!important}
-.counterpress-preset-options>button{padding:11px!important;min-height:108px!important}
+.counterpress-preset-options>button{padding:11px!important;min-height:108px!important;border-color:#d5e7ee!important;background:#fff!important;color:#1b2d36!important}
+.counterpress-preset-options>button:hover{border-color:#7fc9e7!important}
+.counterpress-preset-options>button.active{border-color:#55b8df!important;background:#eef9fd!important;box-shadow:0 0 0 2px rgba(85,184,223,.12)!important}
+.counterpress-preset-options strong{color:#17333f!important}
+.counterpress-preset-options>button>div>span{background:#e7f6fc!important;color:#176f94!important}
+.counterpress-preset-options em{background:#dff4fb!important;color:#155d79!important}
+.counterpress-preset-head>span{color:#17333f!important}
+.counterpress-preset-head>small,.counterpress-preset-options small{color:#607784!important}
+
+/* Remove the old yellow/orange/purple strategy styling. Both tactical states use the club palette. */
+.v12-shell .active-plan-pill.alternative,
+.v12-shell .formation-center-badge.counterpress-shape,
+.v12-shell .strategy-toggle button:last-child.active{
+  background:#eaf7fc!important;
+  border-color:#b9dfed!important;
+  color:#155f7d!important;
+}
+.v12-shell .formation-center-badge.counterpress-shape span{
+  color:#5f8493!important;
+}
+.v12-shell .formation-center-badge.counterpress-shape strong{
+  color:#155f7d!important;
+}
+
+/* Every tactical icon uses the same light-blue/black treatment. */
+.v6-shell .topic-icon,
+.v6-shell .attack-icon,
+.v6-shell .defend-icon,
+.v6-shell .transition-icon,
+.v6-shell .cue-icon{
+  background:#e8f7fc!important;
+  color:#155f7d!important;
+  border-color:#cce8f2!important;
+}
+.v6-shell .topic-icon svg{stroke:currentColor!important}
+.v6-shell .strategy-label,.v6-shell .player-topic-head{color:#17333f!important}
+
+/* Keep normal chips and active controls inside the same blue/white/black system. */
+.v6-shell .active-plan-pill,
+.v6-shell .board-format-pill,
+.v6-shell .formation-center-badge{
+  background:#edf9fd!important;
+  border-color:#c4e4f0!important;
+  color:#155f7d!important;
+}
+.v6-shell .formation-center-badge span{color:#638594!important}
+.v6-shell .formation-center-badge strong{color:#155f7d!important}
+.v6-shell .strategy-toggle button.active{background:#fff!important;color:#155f7d!important;border-color:#bcdfea!important;box-shadow:0 1px 4px rgba(47,159,208,.16)!important}
+
+/* The only red presentation element is the team warning directly below the pitch. */
+.v10-shell .public-principles .compact-rule{
+  background:#fff7f7!important;
+  border-color:#efc8c8!important;
+  color:#d94b4b!important;
+  text-transform:uppercase!important;
+  letter-spacing:.015em!important;
+}
 
 @media(max-width:760px){
   .strategy-toggle button{font-size:10px!important;padding:7px 6px!important}
