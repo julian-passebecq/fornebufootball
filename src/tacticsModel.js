@@ -3,6 +3,13 @@ import { seedData } from './seedData.js'
 export const STRATEGY_KEYS = ['standard', 'alternative']
 export const FORMATION_KEYS = ['7v7', '9v9']
 export const DEFAULT_VISIBILITY = { standard: true, alternative: false }
+export const ROLE_BANDS = ['goalkeeper', 'defender', 'midfielder', 'attacker']
+export const ROLE_COLORS = {
+  goalkeeper: '#2f9fd0',
+  defender: '#355f8f',
+  midfielder: '#d99b2b',
+  attacker: '#d85e5e',
+}
 
 export const DEFAULT_TEAMS = [
   { id: 'team1', number: 1, name: 'Team 1', formation: '9v9', nextGame: { date: '2026-09-19', time: '10:30', opponent: 'Stabæk' } },
@@ -14,16 +21,39 @@ export function clone(value) {
   return JSON.parse(JSON.stringify(value))
 }
 
+export function defaultRoleBand(formation, playerNumber) {
+  if (playerNumber === 1) return 'goalkeeper'
+  if (formation === '7v7') {
+    if ([2, 3].includes(playerNumber)) return 'defender'
+    if ([4, 5, 6].includes(playerNumber)) return 'midfielder'
+    return 'attacker'
+  }
+  if ([2, 3, 4].includes(playerNumber)) return 'defender'
+  if ([5, 6].includes(playerNumber)) return 'midfielder'
+  return 'attacker'
+}
+
 function validPlan(plan) {
   return Boolean(plan?.global?.sections?.length && plan?.players?.length)
 }
 
+function ensurePlayerBands(plan, formation) {
+  if (!plan?.players) return
+  for (const player of plan.players) {
+    if (!ROLE_BANDS.includes(player.roleBand)) {
+      player.roleBand = defaultRoleBand(formation, player.number)
+    }
+  }
+}
+
 export function createPlan(sourceData, formation, strategy) {
   const source = sourceData?.[formation] || seedData[formation]
-  return {
+  const plan = {
     global: clone(source.global[strategy]),
     players: clone(source.players),
   }
+  ensurePlayerBands(plan, formation)
+  return plan
 }
 
 function ensureFormationTemplates(next, oldVersion) {
@@ -56,6 +86,7 @@ function ensureTeamTactics(team, sourceData) {
       if (!validPlan(team.tactics[formation][strategy])) {
         team.tactics[formation][strategy] = createPlan(sourceData, formation, strategy)
       }
+      ensurePlayerBands(team.tactics[formation][strategy], formation)
     }
   }
 }
@@ -87,6 +118,6 @@ export function migrateRemote(remote) {
     return team
   })
 
-  next.version = 5
+  next.version = 6
   return next
 }
