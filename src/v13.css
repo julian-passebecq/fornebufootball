@@ -3,6 +3,9 @@
 .active-plan-pill{white-space:normal!important;text-align:center!important;line-height:1.15!important;max-width:210px}
 .plan-visibility-editor .visibility-name{line-height:1.15}
 
+/* Starting formation intentionally omits the team-level Without the ball card. */
+.starting-formation-hidden{display:none!important}
+
 /* Keep the counter-press preset chooser readable without making the sidebar feel dense. */
 .counterpress-preset-editor{padding:13px!important}
 .counterpress-preset-options{gap:10px!important}
