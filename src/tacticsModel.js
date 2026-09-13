@@ -37,8 +37,25 @@ export const DEFAULT_FORMATS = {
   '9v9': { id: '9v9', label: '9v9', nextGame: { date: '2026-09-20', time: '13:00', opponent: 'Bærum' } },
 }
 
+function relinkSharedPlayerInfo(data) {
+  if (!data?.formats) return data
+  for (const formation of FORMATION_KEYS) {
+    const standardPlayers = data.formats?.[formation]?.tactics?.standard?.players
+    const alternativePlayers = data.formats?.[formation]?.tactics?.alternative?.players
+    if (!standardPlayers || !alternativePlayers) continue
+    for (const standardPlayer of standardPlayers) {
+      const alternativePlayer = alternativePlayers.find(player => player.number === standardPlayer.number)
+      if (!alternativePlayer) continue
+      alternativePlayer.role = standardPlayer.role
+      alternativePlayer.roleBand = standardPlayer.roleBand
+      alternativePlayer.sections = standardPlayer.sections
+    }
+  }
+  return data
+}
+
 export function clone(value) {
-  return JSON.parse(JSON.stringify(value))
+  return relinkSharedPlayerInfo(JSON.parse(JSON.stringify(value)))
 }
 
 export function defaultRoleBand(formation, playerNumber) {
@@ -174,5 +191,5 @@ export function migrateRemote(remote) {
   delete next.teams
   next.coachBriefVersion = COACH_BRIEF_VERSION
   next.version = Math.max(oldVersion, 10)
-  return next
+  return relinkSharedPlayerInfo(next)
 }
