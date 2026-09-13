@@ -12,39 +12,22 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Snapshot source
-        run: tar --exclude=.git --exclude=node_modules --exclude=dist -czf /tmp/board-source.tgz .
-      - uses: actions/upload-artifact@v4
-        with:
-          name: board-source
-          path: /tmp/board-source.tgz
-          retention-days: 7
-      - name: Install
+      - name: Install pinned dependencies
         run: npm install --no-audit --no-fund
-      - name: Offline dependency checkpoint
-        if: github.ref_name == 'fix/mobile-coach-final-20260913'
-        run: tar -czf /tmp/board-dependencies.tgz node_modules package-lock.json
-      - uses: actions/upload-artifact@v4
-        if: github.ref_name == 'fix/mobile-coach-final-20260913'
-        with:
-          name: board-dependencies
-          path: /tmp/board-dependencies.tgz
-          retention-days: 1
       - name: Unit tests
         run: npm test
       - name: Production build
         run: npm run build
+      - name: Install browser engines
+        run: npx playwright install --with-deps chromium webkit
       - name: Browser regression tests
-        if: ${{ hashFiles('playwright.config.*') != '' }}
-        run: |
-          npx playwright install --with-deps chromium webkit
-          npm run test:e2e
+        run: npm run test:e2e
       - name: Test evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -54,5 +37,6 @@ jobs:
             dist
             test-results
             playwright-report
+            package-lock.json
           if-no-files-found: ignore
           retention-days: 7
