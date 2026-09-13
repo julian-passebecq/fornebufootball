@@ -2,12 +2,15 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { seedData } from './seedData'
 import './styles.css'
 
+const STRATEGY_KEYS = ['standard', 'alternative']
+const DEFAULT_VISIBILITY = { standard: true, alternative: false }
+
 const labels = {
   no: {
-    title: 'Fornebu trenerbrett', subtitle: 'Kampplan og spillerroller', teamPlan: 'Lagplan', playerPlan: 'Spillerplan', standard: 'Standard', alternative: 'Plan B', coach: 'Trenermodus', exitCoach: 'Avslutt trenermodus', password: 'Trenerpassord', unlock: 'Lås opp', cancel: 'Avbryt', editHint: 'Dra spillerne på banen. Velg en spiller for å redigere rollen.', save: 'Publiser endringer', saving: 'Publiserer…', saved: 'Publisert', saveError: 'Kunne ikke publisere – prøv igjen', selectPlayer: 'Klikk en spiller for individuell plan', backTeam: 'Tilbake til lagplan', position: 'Posisjon', attack: 'Angrep', defend: 'Forsvar', transition: 'Overgang', keyCue: 'Nøkkelpunkt', formation: 'Formasjon', loginError: 'Feil passord eller trener-serveren er ikke konfigurert.'
+    title: 'Fornebu trenerbrett', subtitle: 'Kampplan og spillerroller', teamPlan: 'Lagplan', playerPlan: 'Spillerplan', standard: 'Standard', alternative: 'Plan B', coach: 'Trenermodus', exitCoach: 'Avslutt trenermodus', password: 'Trenerpassord', unlock: 'Lås opp', cancel: 'Avbryt', editHint: 'Dra spillerne på banen. Velg en spiller for å redigere rollen.', save: 'Publiser endringer', saving: 'Publiserer…', saved: 'Publisert', saveError: 'Kunne ikke publisere – prøv igjen', selectPlayer: 'Klikk en spiller for individuell plan', backTeam: 'Tilbake til lagplan', position: 'Posisjon', attack: 'Angrep', defend: 'Forsvar', transition: 'Overgang', keyCue: 'Nøkkelpunkt', formation: 'Formasjon', loginError: 'Feil passord eller trener-serveren er ikke konfigurert.', publicPlans: 'Vis for laget', shown: 'Vises', hidden: 'Skjult', visibilityHint: 'Kryss av planene som skal være synlige utenfor trenermodus. Minst én plan må være aktiv.'
   },
   en: {
-    title: 'Fornebu Coach Board', subtitle: 'Match plan and player roles', teamPlan: 'Team plan', playerPlan: 'Player plan', standard: 'Standard', alternative: 'Plan B', coach: 'Coach mode', exitCoach: 'Exit coach mode', password: 'Coach password', unlock: 'Unlock', cancel: 'Cancel', editHint: 'Drag players on the pitch. Select a player to edit the role.', save: 'Publish changes', saving: 'Publishing…', saved: 'Published', saveError: 'Could not publish – try again', selectPlayer: 'Click a player for the individual plan', backTeam: 'Back to team plan', position: 'Position', attack: 'Attack', defend: 'Defend', transition: 'Transition', keyCue: 'Key cue', formation: 'Formation', loginError: 'Wrong password or the coach server is not configured.'
+    title: 'Fornebu Coach Board', subtitle: 'Match plan and player roles', teamPlan: 'Team plan', playerPlan: 'Player plan', standard: 'Standard', alternative: 'Plan B', coach: 'Coach mode', exitCoach: 'Exit coach mode', password: 'Coach password', unlock: 'Unlock', cancel: 'Cancel', editHint: 'Drag players on the pitch. Select a player to edit the role.', save: 'Publish changes', saving: 'Publishing…', saved: 'Published', saveError: 'Could not publish – try again', selectPlayer: 'Click a player for the individual plan', backTeam: 'Back to team plan', position: 'Position', attack: 'Attack', defend: 'Defend', transition: 'Transition', keyCue: 'Key cue', formation: 'Formation', loginError: 'Wrong password or the coach server is not configured.', publicPlans: 'Show to team', shown: 'Shown', hidden: 'Hidden', visibilityHint: 'Tick the plans that should be visible outside Coach mode. At least one plan must remain active.'
   }
 }
 
@@ -15,20 +18,30 @@ function clone(value) { return JSON.parse(JSON.stringify(value)) }
 
 function migrateRemote(remote) {
   const next = clone(remote)
-  if (next.version === 2) return next
+  const needsFormationMigration = next.version !== 2 && next.version !== 3
+
   for (const key of ['7v7', '9v9']) {
     const reference = seedData[key]
     if (!next[key] || !reference) continue
-    next[key].shape = reference.shape
-    for (const referencePlayer of reference.players) {
-      const target = next[key].players?.find(player => player.number === referencePlayer.number)
-      if (!target) continue
-      target.x = referencePlayer.x
-      target.y = referencePlayer.y
-      target.role = clone(referencePlayer.role)
+
+    if (needsFormationMigration) {
+      next[key].shape = reference.shape
+      for (const referencePlayer of reference.players) {
+        const target = next[key].players?.find(player => player.number === referencePlayer.number)
+        if (!target) continue
+        target.x = referencePlayer.x
+        target.y = referencePlayer.y
+        target.role = clone(referencePlayer.role)
+      }
+    }
+
+    next[key].strategyVisibility = {
+      ...DEFAULT_VISIBILITY,
+      ...(next[key].strategyVisibility || {})
     }
   }
-  next.version = 2
+
+  next.version = 3
   return next
 }
 
@@ -139,8 +152,8 @@ function LoginModal({ lang, onClose, onSuccess }) {
       const body = await response.json(); onSuccess(body.token)
     } catch { setError(true) }
   }
-  return <div className="modal-backdrop" onMouseDown={onClose}><form className="modal" onMouseDown={e => e.stopPropagation()} onSubmit={submit}>
-    <div className="modal-ball">⚽</div><h2>{t.coach}</h2><label>{t.password}</label><input autoFocus type="password" value={password} onChange={e => setPassword(e.target.value)} />
+  return <div className="modal-backdrop" onMouseDown={onClose}><form className="modal" onMouseDown={e=>e.stopPropagation()} onSubmit={submit}>
+    <div className="modal-ball">⚽</div><h2>{t.coach}</h2><label>{t.password}</label><input autoFocus type="password" value={password} onChange={e=>setPassword(e.target.value)} />
     {error && <div className="error">{t.loginError}</div>}
     <div className="modal-actions"><button type="button" className="ghost" onClick={onClose}>{t.cancel}</button><button type="submit" className="primary">{t.unlock}</button></div>
   </form></div>
@@ -151,7 +164,7 @@ export default function App() {
   const [formation, setFormation] = useState('7v7')
   const [strategy, setStrategy] = useState('standard')
   const [selected, setSelected] = useState(null)
-  const [data, setData] = useState(() => clone(seedData))
+  const [data, setData] = useState(() => migrateRemote(seedData))
   const [coachMode, setCoachMode] = useState(false)
   const [loginOpen, setLoginOpen] = useState(false)
   const [token, setToken] = useState(() => sessionStorage.getItem('fornebu-coach-token') || '')
@@ -167,8 +180,17 @@ export default function App() {
   }, [])
 
   useEffect(() => { setSelected(null) }, [formation])
+
   const current = data[formation]
+  const strategyVisibility = current.strategyVisibility || DEFAULT_VISIBILITY
+  const visibleStrategies = STRATEGY_KEYS.filter(key => strategyVisibility[key])
   const player = useMemo(() => current.players.find(item => item.number === selected), [current, selected])
+
+  useEffect(() => {
+    if (!coachMode && !strategyVisibility[strategy]) {
+      setStrategy(visibleStrategies[0] || 'standard')
+    }
+  }, [coachMode, formation, strategy, strategyVisibility.standard, strategyVisibility.alternative])
 
   function updatePlayerPosition(number, x, y) {
     setData(previous => {
@@ -196,6 +218,22 @@ export default function App() {
     })
   }
 
+  function toggleStrategyVisibility(key) {
+    setData(previous => {
+      const next = clone(previous)
+      const visibility = {
+        ...DEFAULT_VISIBILITY,
+        ...(next[formation].strategyVisibility || {})
+      }
+      const visibleCount = STRATEGY_KEYS.filter(strategyKey => visibility[strategyKey]).length
+      if (visibility[key] && visibleCount === 1) return previous
+      visibility[key] = !visibility[key]
+      next[formation].strategyVisibility = visibility
+      next.version = 3
+      return next
+    })
+  }
+
   async function save() {
     setSaveState('saving')
     try {
@@ -212,6 +250,11 @@ export default function App() {
     else setLoginOpen(true)
   }
 
+  function exitCoach() {
+    setCoachMode(false)
+    setSelected(null)
+  }
+
   function loginSuccess(newToken) {
     sessionStorage.setItem('fornebu-coach-token', newToken)
     setToken(newToken); setCoachMode(true); setLoginOpen(false)
@@ -222,6 +265,7 @@ export default function App() {
   const defence = player?.sections.find(section => section.key === 'defence')
   const transition = player?.sections.find(section => section.key === 'transition')
   const cue = player?.sections.find(section => section.key === 'cue')
+  const strategyButtons = coachMode ? STRATEGY_KEYS : visibleStrategies
 
   return <div className="app-shell">
     <header className="topbar">
@@ -238,7 +282,7 @@ export default function App() {
 
       <div className="header-actions">
         <div className="lang-switch"><button className={lang === 'no' ? 'active' : ''} onClick={() => setLang('no')}>NO</button><button className={lang === 'en' ? 'active' : ''} onClick={() => setLang('en')}>EN</button></div>
-        <button className={coachMode ? 'coach active' : 'coach'} onClick={() => coachMode ? setCoachMode(false) : enterCoach()}>{coachMode ? t.exitCoach : t.coach}</button>
+        <button className={coachMode ? 'coach active' : 'coach'} onClick={() => coachMode ? exitCoach() : enterCoach()}>{coachMode ? t.exitCoach : t.coach}</button>
       </div>
     </header>
 
@@ -256,8 +300,28 @@ export default function App() {
           {!player ? <>
             <div className="sidebar-head">
               <div><span className="eyebrow">{t.teamPlan}</span><h2>{current.global[strategy].title[lang]}</h2></div>
-              <div className="strategy-toggle"><button className={strategy === 'standard' ? 'active' : ''} onClick={() => setStrategy('standard')}>{t.standard}</button><button className={strategy === 'alternative' ? 'active' : ''} onClick={() => setStrategy('alternative')}>{t.alternative}</button></div>
+              {strategyButtons.length > 1 && <div className="strategy-toggle">
+                {strategyButtons.map(key => <button key={key} className={strategy === key ? 'active' : ''} onClick={() => setStrategy(key)}>{key === 'standard' ? t.standard : t.alternative}</button>)}
+              </div>}
             </div>
+
+            {coachMode && <div className="plan-visibility-editor">
+              <div className="visibility-title">{t.publicPlans}</div>
+              <div className="visibility-options">
+                {STRATEGY_KEYS.map(key => {
+                  const enabled = Boolean(strategyVisibility[key])
+                  const lastVisible = enabled && visibleStrategies.length === 1
+                  return <label key={key} className={`visibility-option ${enabled ? 'enabled' : 'disabled'}`}>
+                    <input type="checkbox" checked={enabled} disabled={lastVisible} onChange={() => toggleStrategyVisibility(key)} />
+                    <span className="visibility-check" aria-hidden="true">{enabled ? '✓' : ''}</span>
+                    <span className="visibility-name">{key === 'standard' ? t.standard : t.alternative}</span>
+                    <small>{enabled ? t.shown : t.hidden}</small>
+                  </label>
+                })}
+              </div>
+              <p>{t.visibilityHint}</p>
+            </div>}
+
             <div className="global-sections">{current.global[strategy].sections.map(section => <GlobalSection key={section.key} section={section} lang={lang} editing={coachMode} onChange={value => updateGlobal(section.key, value)}/>)}</div>
           </> : <>
             <div className="player-sidebar-head">
