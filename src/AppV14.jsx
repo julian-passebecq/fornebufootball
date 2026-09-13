@@ -33,22 +33,30 @@ export default function AppV14() {
       if (rule.parentElement !== slot) slot.replaceChildren(rule)
 
       if (window.innerWidth > 980) {
-        const workspaceRect = workspace.getBoundingClientRect()
-        const sidebarRect = sidebar.getBoundingClientRect()
+        // Use the sidebar's layout offsets rather than viewport coordinates.
+        // This keeps the warning anchored immediately below the right card,
+        // even though the sidebar itself is sticky.
+        const gap = 8
+        const top = sidebar.offsetTop + sidebar.offsetHeight + gap
+        const left = sidebar.offsetLeft
+        const width = sidebar.offsetWidth
+
+        slot.style.position = 'absolute'
+        slot.style.top = `${top}px`
+        slot.style.left = `${left}px`
+        slot.style.width = `${width}px`
+        slot.style.margin = '0'
+
         const board = workspace.querySelector('.board-card')
-        const boardHeight = board?.getBoundingClientRect().height || 0
-        const gap = 10
-
-        slot.style.setProperty('--rule-top', `${sidebarRect.bottom - workspaceRect.top + gap}px`)
-        slot.style.setProperty('--rule-left', `${sidebarRect.left - workspaceRect.left}px`)
-        slot.style.setProperty('--rule-width', `${sidebarRect.width}px`)
-
-        const neededHeight = sidebarRect.height + gap + slot.getBoundingClientRect().height
-        workspace.style.minHeight = neededHeight > boardHeight ? `${neededHeight}px` : ''
+        const boardHeight = board?.offsetHeight || 0
+        const requiredHeight = top + slot.offsetHeight
+        workspace.style.minHeight = requiredHeight > boardHeight ? `${requiredHeight}px` : ''
       } else {
-        slot.style.removeProperty('--rule-top')
-        slot.style.removeProperty('--rule-left')
-        slot.style.removeProperty('--rule-width')
+        slot.style.position = ''
+        slot.style.top = ''
+        slot.style.left = ''
+        slot.style.width = ''
+        slot.style.margin = ''
         workspace.style.minHeight = ''
       }
     }
