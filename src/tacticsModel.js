@@ -92,8 +92,8 @@ function ensureTeamTactics(team, sourceData) {
   }
 }
 
-function applyCoachBriefMigration(team, oldVersion) {
-  if (oldVersion >= COACH_BRIEF_VERSION) return
+function applyCoachBriefMigration(team, oldBriefVersion) {
+  if (oldBriefVersion >= COACH_BRIEF_VERSION) return
   for (const formation of FORMATION_KEYS) {
     applyCoachBriefToPlan(team.tactics?.[formation]?.standard, formation)
   }
@@ -102,6 +102,7 @@ function applyCoachBriefMigration(team, oldVersion) {
 export function migrateRemote(remote) {
   const next = clone(remote || seedData)
   const oldVersion = Number(next.version || 0)
+  const oldBriefVersion = Number(next.coachBriefVersion || 0)
 
   ensureFormationTemplates(next, oldVersion)
 
@@ -123,10 +124,11 @@ export function migrateRemote(remote) {
     }
 
     ensureTeamTactics(team, next)
-    applyCoachBriefMigration(team, oldVersion)
+    applyCoachBriefMigration(team, oldBriefVersion)
     return team
   })
 
-  next.version = COACH_BRIEF_VERSION
+  next.coachBriefVersion = COACH_BRIEF_VERSION
+  next.version = Math.max(oldVersion, 6)
   return next
 }
