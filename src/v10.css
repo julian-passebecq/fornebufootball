@@ -17,9 +17,12 @@
 .v10-topbar .format-selector{grid-column:2!important;justify-self:center!important;position:static!important;top:auto!important;left:auto!important;right:auto!important;transform:none!important;margin:0!important}
 .v10-topbar .v9-header-actions{grid-column:3!important;justify-self:end!important}
 
-/* Principles sit directly under the pitch; red rule first, IN/OUT directly below, then the player hint. */
+/* Principles sit directly under the pitch: IN/OUT first, red compact rule below, then the player hint. */
 .v10-board-card{padding-bottom:10px!important}
 .principles-panel{margin:10px 5px 2px;padding:0 3px}
+.public-principles,.coach-principles{display:flex;flex-direction:column}
+.public-principles .in-out-row,.coach-principles .coach-in-out-row{order:1;margin-top:0}
+.public-principles .compact-rule,.coach-principles .compact-rule-editor{order:2;margin-top:8px}
 .compact-rule{padding:8px 12px;border-radius:10px;border:1px solid #f0c9c9;background:#fff7f7;color:var(--ffk-alert);font-size:12px;font-weight:900;line-height:1.35;text-align:center;box-shadow:0 2px 8px #d94b4b0b}
 .in-out-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
 .in-out-row>div{display:flex;align-items:center;gap:9px;padding:7px 11px;border-radius:9px;background:#f8fbfc;border:1px solid #dce9ee;font-size:11px;line-height:1.2}
