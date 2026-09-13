@@ -1,4 +1,4 @@
-/* V13: clearer strategy naming requested by the coach. */
+/* V13/V14: clearer strategy naming + one strategy-independent player detail page. */
 .strategy-toggle button{white-space:normal!important;line-height:1.15!important;min-height:38px!important;padding:8px 10px!important}
 .active-plan-pill{white-space:normal!important;text-align:center!important;line-height:1.15!important;max-width:210px}
 .plan-visibility-editor .visibility-name{line-height:1.15}
@@ -6,115 +6,22 @@
 /* Starting formation intentionally omits the team-level Without the ball card. */
 .starting-formation-hidden{display:none!important}
 
+/* When a player is open, remove all tactical-context chrome above the player icon.
+   The player page is shared between Starting formation and On ball loss. */
+.strategy-sidebar:has(.player-sidebar-head)>.sidebar-brand-row,
+.strategy-sidebar:has(.player-sidebar-head)>.strategy-toggle,
+.strategy-sidebar:has(.player-sidebar-head)>.counterpress-preset-editor{
+  display:none!important;
+}
+.strategy-sidebar:has(.player-sidebar-head){padding-top:18px!important}
+.strategy-sidebar:has(.player-sidebar-head) .player-sidebar-head{margin-top:0!important;padding-top:0!important}
+
 /* Keep the counter-press preset chooser readable without making the sidebar feel dense. */
 .counterpress-preset-editor{padding:13px!important}
 .counterpress-preset-options{gap:10px!important}
 .counterpress-preset-options>button{padding:11px!important;min-height:108px!important}
 
-/* Fornebu palette: light blue, white and black only for UI accents. */
-:root{
-  --ffk-sky:#63c6e8;
-  --ffk-sky-soft:#eef9fd;
-  --ffk-sky-border:#b9e2f0;
-  --ffk-ink:#101820;
-  --ffk-muted:#5b6b73;
-}
-
-/* The three board badges use the same visual family. */
-.board-format-pill,
-.formation-center-badge,
-.active-plan-pill,
-.v12-shell .active-plan-pill.alternative,
-.v12-shell .formation-center-badge.counterpress-shape{
-  background:var(--ffk-sky-soft)!important;
-  border:1px solid var(--ffk-sky-border)!important;
-  color:var(--ffk-ink)!important;
-  box-shadow:none!important;
-}
-.board-format-pill strong,
-.formation-center-badge span,
-.formation-center-badge strong,
-.v12-shell .formation-center-badge.counterpress-shape span,
-.v12-shell .formation-center-badge.counterpress-shape strong,
-.active-plan-pill,
-.v12-shell .active-plan-pill.alternative{
-  color:var(--ffk-ink)!important;
-}
-.formation-center-badge span{opacity:.7!important}
-
-/* Ball-loss strategy is blue/white/black too: no amber, green or purple accents. */
-.v12-shell .strategy-toggle button:last-child.active,
-.strategy-toggle button.active{
-  background:var(--ffk-sky-soft)!important;
-  border-color:var(--ffk-sky-border)!important;
-  color:var(--ffk-ink)!important;
-  box-shadow:none!important;
-}
-.topic-icon,
-.attack-icon,
-.defend-icon,
-.transition-icon,
-.cue-icon,
-.strategy-label .topic-icon,
-.player-topic-head .topic-icon{
-  background:var(--ffk-sky-soft)!important;
-  border-color:var(--ffk-sky-border)!important;
-  color:var(--ffk-ink)!important;
-}
-.topic-icon svg,
-.attack-icon svg,
-.defend-icon svg,
-.transition-icon svg,
-.cue-icon svg{
-  stroke:var(--ffk-ink)!important;
-  color:var(--ffk-ink)!important;
-}
-.instruction-list li::marker{color:#2fa9d7!important}
-.counterpress-preset-options>button.active{
-  border-color:var(--ffk-sky)!important;
-  background:var(--ffk-sky-soft)!important;
-  box-shadow:0 0 0 2px rgba(99,198,232,.14)!important;
-}
-.counterpress-preset-options em{
-  background:var(--ffk-sky-soft)!important;
-  color:var(--ffk-ink)!important;
-  border:1px solid var(--ffk-sky-border)!important;
-}
-.counterpress-preset-options>button>div>span{
-  background:var(--ffk-sky-soft)!important;
-  color:var(--ffk-ink)!important;
-}
-
-/* Remove the duplicated 9v9 / 3-2-3 line above the right panel. */
-.v9-sidebar-brand-row{display:none!important}
-.strategy-sidebar .strategy-toggle{margin-top:0!important}
-
-/* Red warning is deliberately prominent and uppercase. */
-.compact-rule{
-  text-transform:uppercase!important;
-  letter-spacing:.025em!important;
-  font-weight:950!important;
-}
-
-/* Make the formation numbers in the top 7v7 / 9v9 ribbon readable. */
-.format-selector button{padding:7px 12px!important;min-height:48px!important}
-.format-selector button>span{gap:2px!important}
-.format-selector button>span>strong{font-size:13px!important;line-height:1.05!important;color:var(--ffk-ink)!important}
-.format-selector button small{
-  font-size:10px!important;
-  line-height:1.05!important;
-  font-weight:900!important;
-  letter-spacing:.035em!important;
-  opacity:1!important;
-  color:var(--ffk-ink)!important;
-}
-.format-selector button:not(.active)>span>strong,
-.format-selector button:not(.active) small{opacity:.62!important}
-
 @media(max-width:760px){
   .strategy-toggle button{font-size:10px!important;padding:7px 6px!important}
   .counterpress-preset-options>button{min-height:0!important}
-  .format-selector button{padding:6px 8px!important;min-height:44px!important}
-  .format-selector button>span>strong{font-size:12px!important}
-  .format-selector button small{font-size:9px!important}
 }
