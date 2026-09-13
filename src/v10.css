@@ -10,9 +10,12 @@
 
 /* Next-match information is intentionally removed from both player and coach views. */
 .v10-shell .next-game-card-v9,.v10-shell .v9-coach-format-editor{display:none!important}
-.v10-topbar{grid-template-columns:minmax(260px,1fr) auto auto!important;column-gap:34px!important}
-.v10-topbar .format-selector{justify-self:center!important}
-.v10-topbar .v9-header-actions{justify-self:end!important}
+
+/* Desktop ribbon: brand left, 7v7/9v9 geometrically centered, languages right. */
+.v10-topbar{grid-template-columns:minmax(260px,1fr) auto minmax(260px,1fr)!important;column-gap:34px!important;margin-bottom:0!important}
+.v10-topbar .v9-club-brand{grid-column:1!important;justify-self:start!important}
+.v10-topbar .format-selector{grid-column:2!important;justify-self:center!important;position:static!important;top:auto!important;left:auto!important;right:auto!important;transform:none!important;margin:0!important}
+.v10-topbar .v9-header-actions{grid-column:3!important;justify-self:end!important}
 
 /* Principles sit directly under the pitch; red rule first, IN/OUT directly below, then the player hint. */
 .v10-board-card{padding-bottom:10px!important}
@@ -41,7 +44,9 @@
 
 @media(max-width:1100px){
   .v10-topbar{grid-template-columns:1fr auto!important;margin-bottom:78px!important}
-  .v10-topbar .format-selector{top:84px!important}
+  .v10-topbar .v9-club-brand{grid-column:1!important}
+  .v10-topbar .v9-header-actions{grid-column:2!important}
+  .v10-topbar .format-selector{grid-column:auto!important;position:absolute!important;top:84px!important;left:50%!important;transform:translateX(-50%)!important}
 }
 
 @media(max-width:760px){
