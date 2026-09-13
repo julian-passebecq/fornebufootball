@@ -8,7 +8,13 @@
 .v10-lang-switch{display:grid!important;grid-template-columns:repeat(3,auto)!important}
 .v10-lang-switch button{min-width:38px!important;padding-inline:10px!important}
 
-/* Principles sit directly under the pitch, before the click hint. */
+/* Next-match information is intentionally removed from both player and coach views. */
+.v10-shell .next-game-card-v9,.v10-shell .v9-coach-format-editor{display:none!important}
+.v10-topbar{grid-template-columns:minmax(260px,1fr) auto auto!important;column-gap:34px!important}
+.v10-topbar .format-selector{justify-self:center!important}
+.v10-topbar .v9-header-actions{justify-self:end!important}
+
+/* Principles sit directly under the pitch; red rule first, IN/OUT directly below, then the player hint. */
 .v10-board-card{padding-bottom:10px!important}
 .principles-panel{margin:10px 5px 2px;padding:0 3px}
 .compact-rule{padding:8px 12px;border-radius:10px;border:1px solid #f0c9c9;background:#fff7f7;color:var(--ffk-alert);font-size:12px;font-weight:900;line-height:1.35;text-align:center;box-shadow:0 2px 8px #d94b4b0b}
@@ -19,7 +25,7 @@
 .principle-in span{background:var(--ffk-in)}
 .principle-out span{background:var(--ffk-out)}
 .in-out-row strong{font-size:11px;color:#2d4f60}
-.pitch-footer-hint{margin-top:8px!important}
+.pitch-footer-hint{margin-top:10px!important}
 
 /* Coach can edit the new principles in-place and publish them with everything else. */
 .coach-principles{padding:10px;border:1px solid #c9e4ef;border-radius:12px;background:#f6fbfd}
@@ -33,6 +39,11 @@
 /* Removing role-colour controls keeps coach mode consistent with one sky-blue kit. */
 .v10-shell .role-colour-editor{display:none!important}
 
+@media(max-width:1100px){
+  .v10-topbar{grid-template-columns:1fr auto!important;margin-bottom:78px!important}
+  .v10-topbar .format-selector{top:84px!important}
+}
+
 @media(max-width:760px){
   .v10-lang-switch button{min-width:34px!important;padding-inline:7px!important}
   .compact-rule{font-size:10px;padding:7px 9px}
@@ -41,4 +52,6 @@
   .in-out-row span{min-width:30px;height:22px;padding-inline:6px}
   .in-out-row strong{font-size:10px}
   .coach-in-out-row{grid-template-columns:1fr!important}
+  .v10-topbar{margin-bottom:72px!important}
+  .v10-topbar .format-selector{top:70px!important}
 }
