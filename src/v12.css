@@ -1,0 +1,32 @@
+/* V12: Standard + Counter-press strategy. */
+.v12-shell .active-plan-pill.alternative{background:#fff3df!important;border-color:#f2d39a!important;color:#9a5b00!important}
+.v12-shell .formation-center-badge.counterpress-shape{background:#fff9ef!important;border-color:#f3d79f!important}
+.v12-shell .formation-center-badge.counterpress-shape span,.v12-shell .formation-center-badge.counterpress-shape strong{color:#8a5a08!important}
+
+.counterpress-preset-editor{margin:0 0 14px;padding:12px;border:1px solid #d9e8ee;border-radius:14px;background:#f8fbfc}
+.counterpress-preset-head{display:flex;flex-direction:column;gap:3px;margin-bottom:9px}
+.counterpress-preset-head>span{font-size:10px;font-weight:950;letter-spacing:.08em;text-transform:uppercase;color:#285b70}
+.counterpress-preset-head>small{font-size:10px;line-height:1.35;color:#6d8792}
+.counterpress-preset-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.counterpress-preset-options>button{position:relative;text-align:left;border:1px solid #d7e5ea;border-radius:11px;background:#fff;padding:10px;min-height:104px;cursor:pointer;color:#2a4d5b;transition:border-color .15s ease,box-shadow .15s ease,background .15s ease}
+.counterpress-preset-options>button:hover{border-color:#8acbe5}
+.counterpress-preset-options>button.active{border-color:#45b3dd;background:#f2fbff;box-shadow:0 0 0 2px rgba(69,179,221,.12)}
+.counterpress-preset-options>button>div{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px}
+.counterpress-preset-options strong{font-size:11px;color:#164f67}
+.counterpress-preset-options>button>div>span{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:#eaf6fb;padding:3px 7px;font-size:9px;font-weight:900;color:#22779a;white-space:nowrap}
+.counterpress-preset-options em{display:inline-block;margin-bottom:6px;border-radius:999px;background:#dff5e7;color:#287247;padding:3px 7px;font-size:8px;font-style:normal;font-weight:900;letter-spacing:.04em;text-transform:uppercase}
+.counterpress-preset-options small{display:block;font-size:9px;line-height:1.38;color:#6b818b}
+
+/* The tactical principles order requested by the coach: IN/OUT first, red compact rule second. */
+.v12-shell .public-principles .in-out-row{margin-top:0;margin-bottom:8px}
+.v12-shell .public-principles .compact-rule{margin-top:0}
+.v12-shell .coach-principles .coach-in-out-row{margin-top:0;margin-bottom:9px}
+.v12-shell .coach-principles .compact-rule-editor{margin-top:0}
+
+/* Counter-press tab is intentionally distinct from the normal blue Standard tab. */
+.v12-shell .strategy-toggle button:last-child.active{background:#fff4df!important;color:#9a5b00!important;border-color:#efcf91!important}
+
+@media(max-width:760px){
+  .counterpress-preset-options{grid-template-columns:1fr}
+  .counterpress-preset-options>button{min-height:0}
+}
