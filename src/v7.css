@@ -1,0 +1,12 @@
+:root{--ffk-official-logo:url("https://thumblr.uniid.it/product/353432/d424c4e43c43.jpg?format=webp&q=90&width=1920")}
+/* Current Fornebu FK crest, cropped from the club's official Unisport collection image. */
+.club-brand .brand-mark-image{display:none!important}.club-brand::before{content:"";width:46px;height:46px;flex:0 0 46px;border-radius:50%;background-image:var(--ffk-official-logo);background-repeat:no-repeat;background-size:512px 512px;background-position:-334px -124px;box-shadow:0 3px 12px #24566e22,0 0 0 1px #c8e4ef;transition:.18s transform,.18s box-shadow}.club-brand:hover::before{transform:translateY(-1px);box-shadow:0 6px 16px #2f9fd02d,0 0 0 1px #aad5e5}
+/* Keep team choice compact, but restore the game format under each team name. */
+.v6-team-tabs .team-tab-label{display:flex!important;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;line-height:1.05}.v6-team-tabs .team-tab-label::after{content:attr(data-format);font-size:9px;font-weight:850;letter-spacing:.035em;color:#77909b}.v6-team-tabs button.active .team-tab-label::after{color:#2789b2}.v6-team-tabs button:not(.active){opacity:.5;transform:scale(.945)}.v6-team-tabs button:not(.active):hover{opacity:.78;transform:scale(.965)}
+/* Give next-game information more breathing room and push it toward the right side of the ribbon. */
+.v6-topbar{grid-template-columns:minmax(260px,1fr) minmax(780px,1000px) minmax(180px,.85fr)}.v6-next-game{margin-left:auto!important;min-width:265px!important;padding-left:25px!important}.v6-team-ribbon{column-gap:18px!important}
+/* The bottom Back to team plan action is the single, clearer deselection control. */
+.close-player{display:none!important}.player-sidebar-head{padding-right:2px}
+@media(max-width:1360px){.v6-topbar{grid-template-columns:230px minmax(650px,1fr) auto}.v6-next-game{min-width:220px!important;padding-left:17px!important}.v6-team-ribbon{column-gap:10px!important}}
+@media(max-width:1150px){.v6-next-game{margin-left:36px!important}.v6-team-tabs .team-tab-label::after{font-size:8px}}
+@media(max-width:760px){.club-brand::before{width:38px;height:38px;flex-basis:38px;background-size:423px 423px;background-position:-276px -102px}.v6-team-tabs .team-tab-label{align-items:center}.v6-team-tabs .team-tab-label::after{font-size:8px}.v6-next-game{margin:0!important}}
