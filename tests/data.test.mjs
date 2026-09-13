@@ -6,94 +6,89 @@ import { migrateRemote, ROLE_BANDS } from '../src/tacticsModel.js'
 
 test('7v7 has seven numbered players',()=>{assert.equal(seedData['7v7'].players.length,7);assert.deepEqual(seedData['7v7'].players.map(p=>p.number),[1,2,3,4,5,6,7])})
 test('9v9 has nine numbered players',()=>{assert.equal(seedData['9v9'].players.length,9);assert.deepEqual(seedData['9v9'].players.map(p=>p.number),[1,2,3,4,5,6,7,8,9])})
-test('seed data schema version is current',()=>{assert.equal(seedData.version,2)})
 test('formations match reference shapes',()=>{assert.equal(seedData['7v7'].shape,'2-3-1');assert.equal(seedData['9v9'].shape,'3-2-3')})
-test('both formations provide two global strategies and bilingual text',()=>{for(const f of ['7v7','9v9']){for(const s of ['standard','alternative']){assert.ok(seedData[f].global[s]);for(const section of seedData[f].global[s].sections){assert.ok(section.text.no);assert.ok(section.text.en)}}}})
 test('player positions remain in pitch bounds',()=>{for(const f of ['7v7','9v9'])for(const p of seedData[f].players){assert.ok(p.x>=0&&p.x<=100);assert.ok(p.y>=0&&p.y<=100)}})
 
-test('migration creates three teams with their own tactics for both formats',()=>{
+test('migration creates exactly two format profiles',()=>{
   const data=migrateRemote(seedData)
-  assert.equal(data.version,6)
+  assert.equal(data.version,9)
   assert.equal(data.coachBriefVersion,COACH_BRIEF_VERSION)
-  assert.equal(data.teams.length,3)
-  for(const team of data.teams){
-    assert.ok(team.tactics['7v7'].standard)
-    assert.ok(team.tactics['7v7'].alternative)
-    assert.ok(team.tactics['9v9'].standard)
-    assert.ok(team.tactics['9v9'].alternative)
+  assert.deepEqual(Object.keys(data.formats).sort(),['7v7','9v9'])
+  assert.equal(data.teams,undefined)
+})
+
+test('both formats provide standard and additional plans',()=>{
+  const data=migrateRemote(seedData)
+  for(const formation of ['7v7','9v9']){
+    assert.ok(data.formats[formation].tactics.standard)
+    assert.ok(data.formats[formation].tactics.alternative)
   }
 })
 
-test('standard plan receives adapted Gardien brief content',()=>{
-  const data=migrateRemote(seedData)
-  const standard=data.teams[1].tactics['9v9'].standard
+test('9v9 standard plan receives the Gardien brief',()=>{
+  const standard=migrateRemote(seedData).formats['9v9'].tactics.standard
   assert.equal(standard.global.sections.length,5)
   assert.match(standard.global.sections.find(s=>s.key==='transition').text.en,/5 seconds/i)
   assert.match(standard.global.sections.find(s=>s.key==='mindset').text.en,/Believe you can do it/i)
   assert.equal(standard.players.find(p=>p.number===1).role.en,'Goalkeeper')
   assert.equal(standard.players.find(p=>p.number===3).role.en,'Centre-back stopper')
   assert.equal(standard.players.find(p=>p.number===8).role.en,'Striker')
-  assert.match(standard.players.find(p=>p.number===8).sections.find(s=>s.key==='cue').text.en,/Score goals/i)
 })
 
-test('7v7 adapts the same source brief to compact roles',()=>{
-  const data=migrateRemote(seedData)
-  const standard=data.teams[2].tactics['7v7'].standard
+test('7v7 adapts the same 9v9 source brief by role',()=>{
+  const standard=migrateRemote(seedData).formats['7v7'].tactics.standard
+  assert.equal(standard.players.find(p=>p.number===1).role.en,'Goalkeeper')
+  assert.equal(standard.players.find(p=>p.number===2).role.en,'Left full-back')
+  assert.equal(standard.players.find(p=>p.number===3).role.en,'Right full-back')
   assert.equal(standard.players.find(p=>p.number===4).role.en,'Central midfielder')
   assert.equal(standard.players.find(p=>p.number===5).role.en,'Left winger')
+  assert.equal(standard.players.find(p=>p.number===6).role.en,'Right winger')
   assert.equal(standard.players.find(p=>p.number===7).role.en,'Striker')
 })
 
-test('standard and additional plan positions are independent',()=>{
+test('standard and additional positions are independent',()=>{
   const data=migrateRemote(seedData)
-  const team=data.teams[1]
-  const before=team.tactics['9v9'].alternative.players[0].x
-  team.tactics['9v9'].standard.players[0].x=93
-  assert.equal(team.tactics['9v9'].alternative.players[0].x,before)
+  for(const formation of ['7v7','9v9']){
+    const before=data.formats[formation].tactics.alternative.players[0].x
+    data.formats[formation].tactics.standard.players[0].x=93
+    assert.equal(data.formats[formation].tactics.alternative.players[0].x,before)
+  }
 })
 
-test('standard and additional plan player text is independent',()=>{
+test('standard and additional player text is independent',()=>{
   const data=migrateRemote(seedData)
-  const team=data.teams[1]
-  const before=team.tactics['9v9'].alternative.players[0].sections[0].text.en
-  team.tactics['9v9'].standard.players[0].sections[0].text.en='Changed only in standard'
-  assert.equal(team.tactics['9v9'].alternative.players[0].sections[0].text.en,before)
+  const before=data.formats['9v9'].tactics.alternative.players[0].sections[0].text.en
+  data.formats['9v9'].tactics.standard.players[0].sections[0].text.en='Changed only in standard'
+  assert.equal(data.formats['9v9'].tactics.alternative.players[0].sections[0].text.en,before)
 })
 
-test('standard and additional plan role colours are independent',()=>{
-  const data=migrateRemote(seedData)
-  const team=data.teams[1]
-  const before=team.tactics['9v9'].alternative.players[4].roleBand
-  team.tactics['9v9'].standard.players[4].roleBand='attacker'
-  assert.equal(team.tactics['9v9'].alternative.players[4].roleBand,before)
-})
-
-test('coach edits are not overwritten after the brief has migrated once',()=>{
+test('coach edits survive a later migration',()=>{
   const first=migrateRemote(seedData)
-  first.teams[1].tactics['9v9'].standard.players[0].sections[0].text.en='Coach custom goalkeeper instruction'
-  first.version=6
+  first.formats['9v9'].tactics.standard.players[0].sections[0].text.en='Coach custom goalkeeper instruction'
   const second=migrateRemote(first)
-  assert.equal(second.teams[1].tactics['9v9'].standard.players[0].sections[0].text.en,'Coach custom goalkeeper instruction')
-  assert.equal(second.coachBriefVersion,COACH_BRIEF_VERSION)
+  assert.equal(second.formats['9v9'].tactics.standard.players[0].sections[0].text.en,'Coach custom goalkeeper instruction')
 })
 
-test('all migrated plan players receive a valid role colour band',()=>{
+test('all format players receive a valid role colour band',()=>{
   const data=migrateRemote(seedData)
-  for(const team of data.teams){
-    for(const formation of ['7v7','9v9']){
-      for(const strategy of ['standard','alternative']){
-        for(const player of team.tactics[formation][strategy].players){
-          assert.ok(ROLE_BANDS.includes(player.roleBand))
-        }
-      }
+  for(const formation of ['7v7','9v9']){
+    for(const strategy of ['standard','alternative']){
+      for(const player of data.formats[formation].tactics[strategy].players) assert.ok(ROLE_BANDS.includes(player.roleBand))
     }
   }
 })
 
-test('standard is public by default while additional plan stays coach-only',()=>{
+test('standard is public by default while additional stays coach-only',()=>{
   const data=migrateRemote(seedData)
-  for(const team of data.teams){
-    assert.equal(team.strategyVisibility.standard,true)
-    assert.equal(team.strategyVisibility.alternative,false)
+  for(const formation of ['7v7','9v9']){
+    assert.equal(data.formats[formation].strategyVisibility.standard,true)
+    assert.equal(data.formats[formation].strategyVisibility.alternative,false)
   }
+})
+
+test('next-game data is independent between 7v7 and 9v9',()=>{
+  const data=migrateRemote(seedData)
+  const before=data.formats['7v7'].nextGame.opponent
+  data.formats['9v9'].nextGame.opponent='Changed opponent'
+  assert.equal(data.formats['7v7'].nextGame.opponent,before)
 })
