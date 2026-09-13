@@ -1,0 +1,49 @@
+name: Board quality
+on:
+  push:
+    branches: [main, fix/mobile-coach-final-20260913]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: board-quality-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Snapshot source
+        run: tar --exclude=.git --exclude=node_modules --exclude=dist -czf /tmp/board-source.tgz .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: board-source
+          path: /tmp/board-source.tgz
+          retention-days: 7
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Unit tests
+        run: npm test
+      - name: Production build
+        run: npm run build
+      - name: Browser regression tests
+        if: ${{ hashFiles('playwright.config.*') != '' }}
+        run: |
+          npx playwright install --with-deps chromium webkit
+          npm run test:e2e
+      - name: Test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: board-evidence
+          path: |
+            dist
+            test-results
+            playwright-report
+          if-no-files-found: ignore
+          retention-days: 7
