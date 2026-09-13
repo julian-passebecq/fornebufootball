@@ -1,4 +1,5 @@
 import { seedData } from './seedData.js'
+import { applyCoachBriefToPlan, COACH_BRIEF_VERSION } from './coachBriefV8.js'
 
 export const STRATEGY_KEYS = ['standard', 'alternative']
 export const FORMATION_KEYS = ['7v7', '9v9']
@@ -91,6 +92,13 @@ function ensureTeamTactics(team, sourceData) {
   }
 }
 
+function applyCoachBriefMigration(team, oldVersion) {
+  if (oldVersion >= COACH_BRIEF_VERSION) return
+  for (const formation of FORMATION_KEYS) {
+    applyCoachBriefToPlan(team.tactics?.[formation]?.standard, formation)
+  }
+}
+
 export function migrateRemote(remote) {
   const next = clone(remote || seedData)
   const oldVersion = Number(next.version || 0)
@@ -115,9 +123,10 @@ export function migrateRemote(remote) {
     }
 
     ensureTeamTactics(team, next)
+    applyCoachBriefMigration(team, oldVersion)
     return team
   })
 
-  next.version = 6
+  next.version = COACH_BRIEF_VERSION
   return next
 }
