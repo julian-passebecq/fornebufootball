@@ -27,6 +27,13 @@ function setText(node, text) {
   if (node && node.textContent !== text) node.textContent = text
 }
 
+function isWithoutBallLabel(value = '') {
+  const label = value.trim().toLowerCase()
+  return label === 'without the ball'
+    || label === 'sans ballon'
+    || label === 'uten ball'
+}
+
 export default function AppV13() {
   useEffect(() => {
     const root = document.getElementById('root')
@@ -49,10 +56,19 @@ export default function AppV13() {
       const presetTitle = root.querySelector('.counterpress-preset-head > span')
       if (presetTitle) setText(presetTitle, t.counterShape)
 
-      if (root.querySelector('.active-plan-pill.alternative')) {
+      const alternativeActive = Boolean(root.querySelector('.active-plan-pill.alternative'))
+      if (alternativeActive) {
         const playerTopics = root.querySelectorAll('.player-topic-head span:last-child')
         if (playerTopics[1]) setText(playerTopics[1], t.withoutBall)
       }
+
+      // Starting formation describes the team's initial in-possession structure.
+      // Keep "Without the ball" only in the dedicated ball-loss strategy.
+      const standardActive = Boolean(root.querySelector('.active-plan-pill.standard'))
+      root.querySelectorAll('.global-sections .strategy-block').forEach(block => {
+        const label = block.querySelector('.strategy-label span:last-child')?.textContent || ''
+        block.classList.toggle('starting-formation-hidden', standardActive && isWithoutBallLabel(label))
+      })
     }
 
     const frame = requestAnimationFrame(relabel)
