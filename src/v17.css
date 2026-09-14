@@ -20,15 +20,28 @@
   font-weight:850!important;
 }
 
-/* Make the selected shirt easier to track on the pitch without making it visually loud. */
+/* Selected player: use a light circular ring instead of a square highlight. */
 .player-marker.selected{
-  border-radius:12px!important;
-  background:rgba(255,255,255,.12)!important;
-  box-shadow:0 0 0 2px rgba(255,255,255,.82),0 0 0 4px rgba(39,157,204,.34)!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  border-radius:50%!important;
+}
+.player-marker.selected::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:52px;
+  height:52px;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,.9);
+  box-shadow:0 0 0 2px rgba(39,157,204,.38),0 2px 8px rgba(20,72,91,.16);
+  pointer-events:none;
 }
 .player-marker.selected .jersey{
-  transform:scale(1.10)!important;
-  filter:drop-shadow(0 0 6px rgba(255,255,255,.9)) drop-shadow(0 4px 5px rgba(20,72,91,.34))!important;
+  transform:scale(1.08)!important;
+  filter:drop-shadow(0 0 5px rgba(255,255,255,.88)) drop-shadow(0 4px 5px rgba(20,72,91,.30))!important;
 }
 
 @media(max-width:600px){
@@ -39,5 +52,10 @@
     font-size:13px!important;
     padding:8px 10px!important;
   }
-  .player-marker.selected{box-shadow:0 0 0 2px rgba(255,255,255,.82),0 0 0 3px rgba(39,157,204,.34)!important}
+  .player-marker.selected::after{
+    width:48px;
+    height:48px;
+    border-width:2px;
+    box-shadow:0 0 0 2px rgba(39,157,204,.34),0 2px 7px rgba(20,72,91,.14);
+  }
 }
