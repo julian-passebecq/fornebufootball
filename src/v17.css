@@ -1,0 +1,43 @@
+/* Selected player: the shirt already carries the number, so avoid repeating #N beside it. */
+.player-sidebar-head>h2{display:none!important}
+
+/* Give the player's position/role the visual centre of the header and slightly more weight. */
+.player-sidebar-head{
+  display:grid!important;
+  grid-template-columns:auto minmax(0,1fr)!important;
+  align-items:center!important;
+  column-gap:16px!important;
+}
+.player-sidebar-head>.role-badge{
+  justify-self:center!important;
+  margin:0!important;
+  min-width:150px!important;
+  max-width:min(100%,280px)!important;
+  padding:9px 14px!important;
+  text-align:center!important;
+  font-size:14px!important;
+  line-height:1.25!important;
+  font-weight:850!important;
+}
+
+/* Make the selected shirt easier to track on the pitch without making it visually loud. */
+.player-marker.selected{
+  border-radius:12px!important;
+  background:rgba(255,255,255,.12)!important;
+  box-shadow:0 0 0 2px rgba(255,255,255,.82),0 0 0 4px rgba(39,157,204,.34)!important;
+}
+.player-marker.selected .jersey{
+  transform:scale(1.10)!important;
+  filter:drop-shadow(0 0 6px rgba(255,255,255,.9)) drop-shadow(0 4px 5px rgba(20,72,91,.34))!important;
+}
+
+@media(max-width:600px){
+  .player-sidebar-head{column-gap:11px!important}
+  .player-sidebar-head>.role-badge{
+    min-width:0!important;
+    width:min(100%,240px)!important;
+    font-size:13px!important;
+    padding:8px 10px!important;
+  }
+  .player-marker.selected{box-shadow:0 0 0 2px rgba(255,255,255,.82),0 0 0 3px rgba(39,157,204,.34)!important}
+}
