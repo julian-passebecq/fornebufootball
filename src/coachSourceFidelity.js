@@ -212,7 +212,9 @@ export function applyCoachSourceFidelity(data) {
         'Arrière latéral gauche','Arrière latéral droit','Milieu défensif gauche','Milieu défensif droit',
         'Ailier gauche','Ailier droit',
       ]
-      if (!player.role?.fr || oldRoleCandidates.includes(player.role.fr)) player.role.fr = source.role
+      // The original brief maps directly to the 9v9 shirt-number roles. The 7v7
+      // board is a reduced-format adaptation, so keep its existing role labels.
+      if (format === '9v9' && (!player.role?.fr || oldRoleCandidates.includes(player.role.fr))) player.role.fr = source.role
 
       for (const section of player.sections || []) {
         if (!source[section.key]) continue
