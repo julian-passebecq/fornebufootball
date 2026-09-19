@@ -73,7 +73,7 @@ test('coach can renumber, reject duplicates, swap, and publish without moving ot
  await page.getByRole('button',{name:'Échanger #17 / #2',exact:true}).click();await expect(page.locator('.player-sidebar-head h2')).toHaveText('#2')
  await page.getByRole('button',{name:'VALIDER',exact:true}).click();await expect(page.getByRole('button',{name:'VALIDÉ ✓',exact:true})).toBeVisible()
  expect(ctx.posts).toHaveLength(1);for(const phase of ['standard','alternative']){expect(ctx.posts[0].formats['9v9'].tactics[phase].players[6].shirtNumber).toBe(2);expect(ctx.posts[0].formats['9v9'].tactics[phase].players[3].shirtNumber).toBe(17)}
- await page.reload();await selectPlayer(page);await expect(page.locator('.player-sidebar-head h2')).toHaveText('#2');expect(ctx.errors).toEqual([])
+ await page.reload();await page.getByRole('button',{name:'9v9',exact:true}).click();await selectPlayer(page);await expect(page.locator('.player-sidebar-head h2')).toHaveText('#2');expect(ctx.errors).toEqual([])
 })
 
 test('vertical drag maps to stored coordinates and undo restores a single phase',async({page})=>{
