@@ -1,7 +1,13 @@
 import { migrateRemote, FORMATION_KEYS, STRATEGY_KEYS } from './tacticsModel.js'
 import { prepareCounterPressData, applyCounterPressPreset } from './counterPressPresets.js'
 
-export const BOARD_VERSION = 15
+export const BOARD_VERSION = 16
+
+// Shirt numbers supplied by the coach in the 7v7 / 9v9 reference photos.
+export const REFERENCE_SHIRT_NUMBERS = {
+  '7v7': { 1:1, 2:3, 3:2, 4:4, 5:9, 6:11, 7:10 },
+  '9v9': { 1:1, 2:3, 3:4, 4:2, 5:7, 6:10, 7:8, 8:9, 9:11 },
+}
 export const copy = value => JSON.parse(JSON.stringify(value))
 export const shirtNumber = player => player.shirtNumber ?? player.number
 export const localized = (value, lang) => typeof value === 'string' ? value : value?.[lang] ?? value?.en ?? value?.fr ?? value?.no ?? ''
@@ -9,12 +15,16 @@ export const localized = (value, lang) => typeof value === 'string' ? value : va
 // `number` is the original stable tactical slot. The editable shirt number is
 // separate, so presets, roles and saved positions never jump to another player.
 export function normalizeBoard(remote) {
+  const sourceVersion = Number(remote?.version || 0)
+  const applyReferenceNumbers = sourceVersion < BOARD_VERSION
   const next = prepareCounterPressData(migrateRemote(remote))
   for (const format of FORMATION_KEYS) {
     const profile = next.formats[format]
     const used = new Set()
     for (const player of profile.tactics.standard.players) {
-      let value = Number(shirtNumber(player))
+      let value = applyReferenceNumbers
+        ? Number(REFERENCE_SHIRT_NUMBERS[format]?.[player.number])
+        : Number(shirtNumber(player))
       if (!Number.isInteger(value) || value < 1 || value > 99 || used.has(value)) {
         value = Number(player.number)
         while (used.has(value)) value++
