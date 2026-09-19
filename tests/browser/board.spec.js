@@ -32,7 +32,7 @@ test('public layout, touch selection and single shared player page',async({page,
  const ctx=await fixture(page);await page.goto('/');await expect(page.locator('.global-sections .strategy-block')).toHaveCount(4)
  await expect(page.locator('a[href="/coach"],.coach-entry-v14,.validate-button')).toHaveCount(0)
  await expect(page.locator('.format-selector button')).toHaveText(['7v7','9v9'])
- await expect(page.locator('.board-format-pill')).toHaveText('7v7');await expect(page.locator('.player-marker')).toHaveCount(7);await assertLayout(page)
+ await expect(page.locator('.board-format-pill')).toHaveText('7v7');await expect(page.locator('.player-marker')).toHaveCount(7);await expect(page.locator('.player-marker .jersey>span')).toHaveText(['1','3','2','4','9','11','10']);await assertLayout(page)
  await page.screenshot({path:testInfo.outputPath('public-initial.png'),fullPage:true})
  const marker=page.locator('[data-player-slot="7"]');if(isMobile)await marker.tap();else await marker.click()
  await expect(page.locator('.player-sidebar-head h2')).toHaveText('#10');await expect(page.locator('.strategy-toggle')).toHaveCount(0)
@@ -48,7 +48,7 @@ test('auto/manual orientation persists and works with 7v7 and 9v9',async({page},
  for(const orientation of ['vertical','horizontal']){await view.selectOption(orientation);await expect(page.locator('.pitch')).toHaveAttribute('data-orientation',orientation);await assertLayout(page);await page.screenshot({path:testInfo.outputPath(`${orientation}.png`),fullPage:true})}
  await page.reload();await expect(page.locator('.pitch')).toHaveAttribute('data-orientation','horizontal')
  await expect(page.locator('.board-format-pill')).toHaveText('7v7');await expect(page.locator('.player-marker')).toHaveCount(7)
- await page.getByRole('button',{name:'9v9',exact:true}).click();await expect(page.locator('.player-marker')).toHaveCount(9)
+ await page.getByRole('button',{name:'9v9',exact:true}).click();await expect(page.locator('.player-marker')).toHaveCount(9);await expect(page.locator('.player-marker .jersey>span')).toHaveText(['1','3','4','2','7','10','8','9','11'])
  await view.selectOption('vertical');await assertLayout(page);expect(ctx.posts).toHaveLength(0);expect(ctx.errors).toEqual([])
 })
 
