@@ -32,10 +32,10 @@ test('public layout, touch selection and single shared player page',async({page,
  const ctx=await fixture(page);await page.goto('/');await expect(page.locator('.global-sections .strategy-block')).toHaveCount(4)
  await expect(page.locator('a[href="/coach"],.coach-entry-v14,.validate-button')).toHaveCount(0)
  await expect(page.locator('.format-selector button')).toHaveText(['7v7','9v9'])
- await expect(page.locator('.board-format-pill')).toHaveText('9v9');await assertLayout(page)
+ await expect(page.locator('.board-format-pill')).toHaveText('7v7');await expect(page.locator('.player-marker')).toHaveCount(7);await assertLayout(page)
  await page.screenshot({path:testInfo.outputPath('public-initial.png'),fullPage:true})
  const marker=page.locator('[data-player-slot="7"]');if(isMobile)await marker.tap();else await marker.click()
- await expect(page.locator('.player-sidebar-head h2')).toHaveText('#7');await expect(page.locator('.strategy-toggle')).toHaveCount(0)
+ await expect(page.locator('.player-sidebar-head h2')).toHaveText('#10');await expect(page.locator('.strategy-toggle')).toHaveCount(0)
  const guidance=await page.locator('.player-topics').innerText();await page.locator('.back-team-button').click()
  await page.getByRole('button',{name:'On ball loss',exact:true}).click();await expect(page.locator('[data-section="withoutBall"]')).toBeVisible()
  await selectPlayer(page);expect(await page.locator('.player-topics').innerText()).toBe(guidance)
@@ -47,7 +47,8 @@ test('auto/manual orientation persists and works with 7v7 and 9v9',async({page},
  const {width,height}=page.viewportSize();await expect(page.locator('.pitch')).toHaveAttribute('data-orientation',width<=1180&&height>width?'vertical':'horizontal')
  for(const orientation of ['vertical','horizontal']){await view.selectOption(orientation);await expect(page.locator('.pitch')).toHaveAttribute('data-orientation',orientation);await assertLayout(page);await page.screenshot({path:testInfo.outputPath(`${orientation}.png`),fullPage:true})}
  await page.reload();await expect(page.locator('.pitch')).toHaveAttribute('data-orientation','horizontal')
- await page.getByRole('button',{name:'7v7',exact:true}).click();await expect(page.locator('.player-marker')).toHaveCount(7)
+ await expect(page.locator('.board-format-pill')).toHaveText('7v7');await expect(page.locator('.player-marker')).toHaveCount(7)
+ await page.getByRole('button',{name:'9v9',exact:true}).click();await expect(page.locator('.player-marker')).toHaveCount(9)
  await view.selectOption('vertical');await assertLayout(page);expect(ctx.posts).toHaveLength(0);expect(ctx.errors).toEqual([])
 })
 
@@ -64,7 +65,7 @@ test('coach starts French, one green save at left, English/Norwegian are read-on
 })
 
 test('coach can renumber, reject duplicates, swap, and publish without moving other players',async({page})=>{
- const ctx=await fixture(page);await openCoach(page);await selectPlayer(page)
+ const ctx=await fixture(page);await openCoach(page);await page.getByRole('button',{name:'9v9',exact:true}).click();await selectPlayer(page)
  const start=await page.locator('[data-player-slot="7"]').getAttribute('style')
  await page.getByLabel('Numéro du maillot',{exact:true}).fill('17');await page.getByRole('button',{name:'Appliquer',exact:true}).click()
  await expect(page.locator('.player-sidebar-head h2')).toHaveText('#17');expect(await page.locator('[data-player-slot="7"]').getAttribute('style')).toBe(start)
@@ -76,7 +77,7 @@ test('coach can renumber, reject duplicates, swap, and publish without moving ot
 })
 
 test('vertical drag maps to stored coordinates and undo restores a single phase',async({page})=>{
- const ctx=await fixture(page);await openCoach(page);await page.getByLabel('Vue du terrain',{exact:true}).selectOption('vertical')
+ const ctx=await fixture(page);await openCoach(page);await page.getByRole('button',{name:'9v9',exact:true}).click();await page.getByLabel('Vue du terrain',{exact:true}).selectOption('vertical')
  const marker=page.locator('[data-player-slot="7"]');await marker.scrollIntoViewIfNeeded();const old=await marker.getAttribute('style');let b=await marker.boundingBox()
  await page.mouse.move(b.x+b.width/2,b.y+b.height/2);await page.mouse.down();await page.mouse.move(b.x+b.width/2+30,b.y+b.height/2-45,{steps:8});await page.mouse.up();await expect(marker).not.toHaveAttribute('style',old)
  await page.getByRole('button',{name:'VALIDER',exact:true}).click();await expect(page.getByRole('button',{name:'VALIDÉ ✓',exact:true})).toBeVisible()
@@ -117,7 +118,7 @@ test('failed initial load cannot overwrite published plans with seed data',async
 })
 
 test('both presets compact and student controls remain clean after language/phase changes',async({page})=>{
- const ctx=await fixture(page);await openCoach(page);await page.getByRole('button',{name:'À la perte de balle',exact:true}).click()
+ const ctx=await fixture(page);await openCoach(page);await page.getByRole('button',{name:'9v9',exact:true}).click();await page.getByRole('button',{name:'À la perte de balle',exact:true}).click()
  await expect(page.locator('.counterpress-preset-options button')).toHaveCount(2);await expect(page.locator('.counterpress-preset-options')).not.toContainText('Plus de joueurs')
  await page.locator('.counterpress-preset-options button').last().click();await expect(page.locator('.formation-center-badge strong')).toHaveText('2-3-3')
  await page.getByRole('button',{name:'7v7',exact:true}).click();await expect(page.locator('.player-marker')).toHaveCount(7)
