@@ -20,3 +20,26 @@ test('coach reference shirt numbers match supplied formation photos',()=>{
   assert.deepEqual(d.formats['7v7'].tactics.standard.players.map(shirtNumber),[1,3,2,4,9,11,10])
   assert.deepEqual(d.formats['9v9'].tactics.standard.players.map(shirtNumber),[1,3,4,2,7,10,8,9,11])
 })
+
+test('coach source-fidelity pass restores detailed original brief concepts',()=>{
+  const d=normalizeBoard()
+  const p10=d.formats['9v9'].tactics.standard.players.find(p=>p.number===6)
+  const p11=d.formats['9v9'].tactics.standard.players.find(p=>p.number===9)
+  const striker=d.formats['9v9'].tactics.standard.players.find(p=>p.number===8)
+  assert.equal(p10.role.fr,'Milieu offensif')
+  assert.equal(p11.role.fr,'Offensif de couloir')
+  assert.match(p10.sections.find(s=>s.key==='possession').text.fr,/nombre limité de passes/)
+  assert.match(striker.sections.find(s=>s.key==='cue').text.fr,/Marquer, marquer, marquer/)
+  assert.match(d.formats['9v9'].tactics.standard.global.sections.find(s=>s.key==='attack').text.en,/midfielder is always available/)
+  assert.equal(d.coachSourceVersion,1)
+})
+
+test('source-fidelity pass preserves coach-authored French text',()=>{
+  const d=normalizeBoard()
+  d.coachSourceVersion=0
+  const target=d.formats['9v9'].tactics.standard.players.find(p=>p.number===6)
+  target.sections.find(s=>s.key==='possession').text.fr='Texte personnalisé du coach à conserver.'
+  const again=normalizeBoard(d)
+  const preserved=again.formats['9v9'].tactics.standard.players.find(p=>p.number===6)
+  assert.equal(preserved.sections.find(s=>s.key==='possession').text.fr,'Texte personnalisé du coach à conserver.')
+})
