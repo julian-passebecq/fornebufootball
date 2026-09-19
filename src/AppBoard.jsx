@@ -111,7 +111,7 @@ function CoachGate({ onLogin, expired }) {
 export default function AppBoard() {
   const coachRoute = window.location.pathname.replace(/\/+$/,'') === '/coach'
   const [token,setToken]=useState(initialToken), [lang,setLang]=useState(coachRoute?'fr':'en')
-  const [format,setFormat]=useState('9v9'), [phase,setPhase]=useState('standard'), [selected,setSelected]=useState(null)
+  const [format,setFormat]=useState('7v7'), [phase,setPhase]=useState('standard'), [selected,setSelected]=useState(null)
   const [data,setData]=useState(()=>normalizeBoard()), dataRef=useRef(data)
   const [savedSnapshot,setSavedSnapshot]=useState(''), [loadState,setLoadState]=useState('loading'), [loadAttempt,setLoadAttempt]=useState(0)
   const [saveState,setSaveState]=useState(''), [notice,setNotice]=useState('')
