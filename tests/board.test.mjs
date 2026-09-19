@@ -43,3 +43,38 @@ test('source-fidelity pass preserves coach-authored French text',()=>{
   const preserved=again.formats['9v9'].tactics.standard.players.find(p=>p.number===6)
   assert.equal(preserved.sections.find(s=>s.key==='possession').text.fr,'Texte personnalisé du coach à conserver.')
 })
+
+test('reference shirt numbers are identical in both tactical phases',()=>{
+  const d=normalizeBoard()
+  for(const [format,expected] of Object.entries({
+    '7v7':[1,3,2,4,9,11,10],
+    '9v9':[1,3,4,2,7,10,8,9,11],
+  })){
+    for(const phase of ['standard','alternative']){
+      assert.deepEqual(d.formats[format].tactics[phase].players.map(shirtNumber),expected)
+    }
+  }
+})
+
+test('published version keeps later coach shirt-number and position edits',()=>{
+  let d=normalizeBoard()
+  d=setShirtNumber(d,'7v7',7,27)
+  d=movePlayer(d,'7v7','standard',7,77,44)
+  const again=normalizeBoard(JSON.parse(JSON.stringify(d)))
+  assert.equal(shirtNumber(again.formats['7v7'].tactics.standard.players.find(p=>p.number===7)),27)
+  assert.equal(shirtNumber(again.formats['7v7'].tactics.alternative.players.find(p=>p.number===7)),27)
+  assert.equal(again.formats['7v7'].tactics.standard.players.find(p=>p.number===7).x,77)
+  assert.equal(again.formats['7v7'].tactics.standard.players.find(p=>p.number===7).y,44)
+})
+
+test('9v9 coach-source roles follow the shirt numbers in the reference photo',()=>{
+  const d=normalizeBoard()
+  const byShirt=Object.fromEntries(d.formats['9v9'].tactics.standard.players.map(p=>[shirtNumber(p),p]))
+  assert.equal(byShirt[1].role.fr,'Gardien')
+  assert.match(byShirt[4].role.fr,/Défenseur central stoppeur/)
+  assert.match(byShirt[7].role.fr,/Milieu défensif/)
+  assert.equal(byShirt[10].role.fr,'Milieu offensif')
+  assert.equal(byShirt[8].role.fr,'Milieu offensif')
+  assert.equal(byShirt[11].role.fr,'Offensif de couloir')
+  assert.equal(byShirt[9].role.fr,'Avant-centre')
+})
