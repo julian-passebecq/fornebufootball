@@ -1,5 +1,6 @@
 import { migrateRemote, FORMATION_KEYS, STRATEGY_KEYS } from './tacticsModel.js'
 import { prepareCounterPressData, applyCounterPressPreset } from './counterPressPresets.js'
+import { applyCoachSourceFidelity } from './coachSourceFidelity.js'
 
 export const BOARD_VERSION = 16
 
@@ -17,7 +18,7 @@ export const localized = (value, lang) => typeof value === 'string' ? value : va
 export function normalizeBoard(remote) {
   const sourceVersion = Number(remote?.version || 0)
   const applyReferenceNumbers = sourceVersion < BOARD_VERSION
-  const next = prepareCounterPressData(migrateRemote(remote))
+  const next = prepareCounterPressData(applyCoachSourceFidelity(migrateRemote(remote)))
   for (const format of FORMATION_KEYS) {
     const profile = next.formats[format]
     const used = new Set()
