@@ -3,8 +3,12 @@ import { prepareCounterPressData, applyCounterPressPreset } from './counterPress
 import { applyCoachSourceFidelity } from './coachSourceFidelity.js'
 
 export const BOARD_VERSION = 16
+export const COACH_NUMBERING_VERSION = 1
 
-// Shirt numbers supplied by the coach in the 7v7 / 9v9 reference photos.
+// Exact shirt numbers from the coach's two formation photos.
+// Slots are stable tactical identities; only the displayed shirt number changes.
+// 7v7 photo: GK 1; defenders 3/2; midfield line 9/4/11; forward 10.
+// 9v9 photo: GK 1; back three 3/4/2; midfield pair 7/10; front three 8/9/11.
 export const REFERENCE_SHIRT_NUMBERS = {
   '7v7': { 1:1, 2:3, 3:2, 4:4, 5:9, 6:11, 7:10 },
   '9v9': { 1:1, 2:3, 3:4, 4:2, 5:7, 6:10, 7:8, 8:9, 9:11 },
@@ -16,8 +20,10 @@ export const localized = (value, lang) => typeof value === 'string' ? value : va
 // `number` is the original stable tactical slot. The editable shirt number is
 // separate, so presets, roles and saved positions never jump to another player.
 export function normalizeBoard(remote) {
-  const sourceVersion = Number(remote?.version || 0)
-  const applyReferenceNumbers = sourceVersion < BOARD_VERSION
+  // Numbering has its own migration marker. Do not couple this to the generic
+  // board version: an already-published board may be structurally current while
+  // still carrying the old shirt numbers.
+  const applyReferenceNumbers = Number(remote?.coachNumberingVersion || 0) < COACH_NUMBERING_VERSION
   const next = prepareCounterPressData(applyCoachSourceFidelity(migrateRemote(remote)))
   for (const format of FORMATION_KEYS) {
     const profile = next.formats[format]
@@ -41,6 +47,7 @@ export function normalizeBoard(remote) {
       }
     }
   }
+  next.coachNumberingVersion = COACH_NUMBERING_VERSION
   next.version = Math.max(BOARD_VERSION, Number(next.version) || 0)
   return next
 }
