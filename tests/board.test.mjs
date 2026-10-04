@@ -78,3 +78,27 @@ test('9v9 coach-source roles follow the shirt numbers in the reference photo',()
   assert.equal(byShirt[11].role.fr,'Offensif de couloir')
   assert.equal(byShirt[9].role.fr,'Avant-centre')
 })
+
+test('coach photo numbering is corrected even on a structurally current saved board',()=>{
+  const d=normalizeBoard()
+  d.coachNumberingVersion=0
+  d.version=16
+  for(const format of ['7v7','9v9']){
+    for(const phase of ['standard','alternative']){
+      d.formats[format].tactics[phase].players.forEach((p,i)=>{p.shirtNumber=i+1})
+    }
+  }
+  const fixed=normalizeBoard(d)
+  assert.deepEqual(fixed.formats['7v7'].tactics.standard.players.map(shirtNumber),[1,3,2,4,9,11,10])
+  assert.deepEqual(fixed.formats['9v9'].tactics.standard.players.map(shirtNumber),[1,3,4,2,7,10,8,9,11])
+  assert.equal(fixed.coachNumberingVersion,1)
+})
+
+test('after the coach-numbering migration, later manual number edits are preserved',()=>{
+  let d=normalizeBoard()
+  d=setShirtNumber(d,'9v9',8,19)
+  assert.equal(d.coachNumberingVersion,1)
+  const again=normalizeBoard(JSON.parse(JSON.stringify(d)))
+  assert.equal(shirtNumber(again.formats['9v9'].tactics.standard.players.find(p=>p.number===8)),19)
+  assert.equal(shirtNumber(again.formats['9v9'].tactics.alternative.players.find(p=>p.number===8)),19)
+})
