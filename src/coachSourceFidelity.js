@@ -1,7 +1,7 @@
 // Source-fidelity layer for the coach's original "Gardien" brief.
 // It enriches only untouched/default copy. Any field already changed by the coach
 // is deliberately preserved.
-export const COACH_SOURCE_VERSION = 2
+export const COACH_SOURCE_VERSION = 3
 
 const OLD_FR_GLOBAL = {
   start: 'Lever la tête et jouer simple.\nSe déplacer après la passe ; le milieu doit toujours être disponible.',
@@ -226,6 +226,35 @@ function applyNineV9ForwardTextV2(data) {
   }
 }
 
+function applyNineV9ForwardRolesV3(data) {
+  const plan = data.formats?.['9v9']?.tactics?.standard
+  if (!plan?.players) return
+
+  // Keep coach-authored custom labels. Only repair known generated/stale labels
+  // left behind by the 9/11 shirt-number inversion.
+  const fixes = {
+    7: {
+      next: 'Ailier gauche',
+      stale: ['Milieu offensif', 'Offensif de couloir', 'Avant-centre', 'Ailier droit'],
+    },
+    8: {
+      next: 'Ailier droit',
+      stale: ['Avant-centre', 'Offensif de couloir', 'Milieu offensif', 'Ailier gauche'],
+    },
+    9: {
+      next: 'Avant-centre',
+      stale: ['Offensif de couloir', 'Milieu offensif', 'Ailier droit', 'Ailier gauche'],
+    },
+  }
+
+  for (const player of plan.players) {
+    const fix = fixes[player.number]
+    if (!fix) continue
+    const current = player.role?.fr
+    if (!current || fix.stale.includes(current)) player.role.fr = fix.next
+  }
+}
+
 export function applyCoachSourceFidelity(data) {
   if (!data?.formats) return data
   const previousVersion = Number(data.coachSourceVersion || 0)
@@ -265,6 +294,7 @@ export function applyCoachSourceFidelity(data) {
   }
 
   if (previousVersion < 2) applyNineV9ForwardTextV2(data)
+  if (previousVersion < 3) applyNineV9ForwardRolesV3(data)
 
   data.coachSourceVersion = COACH_SOURCE_VERSION
   return data
