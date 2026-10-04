@@ -1,7 +1,7 @@
 // Source-fidelity layer for the coach's original "Gardien" brief.
 // It enriches only untouched/default copy. Any field already changed by the coach
 // is deliberately preserved.
-export const COACH_SOURCE_VERSION = 1
+export const COACH_SOURCE_VERSION = 2
 
 const OLD_FR_GLOBAL = {
   start: 'Lever la tête et jouer simple.\nSe déplacer après la passe ; le milieu doit toujours être disponible.',
@@ -148,7 +148,7 @@ const SOURCE_ROLES = {
 const SOURCE_MAP = {
   '9v9': {
     1:'goalkeeper', 2:'fullBack', 3:'stopper', 4:'fullBack',
-    5:'defMid', 6:'attackingMid', 7:'attackingMid', 8:'striker', 9:'support11',
+    5:'defMid', 6:'attackingMid', 7:'support11', 8:'support11', 9:'striker',
   },
   // 7v7 is an adaptation of the same source brief to the reduced formation.
   '7v7': {
@@ -191,41 +191,80 @@ function maybeFromCandidates(target, lang, candidates, next) {
   if (!current || candidates.includes(current)) target[lang] = next
 }
 
+function generatedPlayerTextCandidates(sectionKey) {
+  return [
+    OLD_FR.centralMid?.[sectionKey],
+    OLD_FR.defMid?.[sectionKey],
+    OLD_FR.winger?.[sectionKey],
+    OLD_FR.striker?.[sectionKey],
+    SOURCE_ROLES.attackingMid?.[sectionKey],
+    SOURCE_ROLES.support11?.[sectionKey],
+    SOURCE_ROLES.striker?.[sectionKey],
+  ].filter(Boolean)
+}
+
+function applyNineV9ForwardTextV2(data) {
+  const plan = data.formats?.['9v9']?.tactics?.standard
+  if (!plan?.players) return
+
+  // Coach correction after the 9/11 shirt-number swap:
+  // tactical slot 7 = shirt 8, slot 8 = shirt 11, slot 9 = shirt 9.
+  // Only shared guidance text changes here. Never touch role labels or coordinates:
+  // the coach has already positioned and named these players himself.
+  const kindBySlot = { 7:'support11', 8:'support11', 9:'striker' }
+
+  for (const player of plan.players) {
+    const kind = kindBySlot[player.number]
+    const source = SOURCE_ROLES[kind]
+    if (!source) continue
+
+    for (const section of player.sections || []) {
+      const nextText = source[section.key]
+      if (!nextText) continue
+      maybeFromCandidates(section.text, 'fr', generatedPlayerTextCandidates(section.key), nextText)
+    }
+  }
+}
+
 export function applyCoachSourceFidelity(data) {
   if (!data?.formats) return data
-  if (Number(data.coachSourceVersion || 0) >= COACH_SOURCE_VERSION) return data
+  const previousVersion = Number(data.coachSourceVersion || 0)
+  if (previousVersion >= COACH_SOURCE_VERSION) return data
 
-  for (const format of ['7v7','9v9']) {
-    const plan = data.formats?.[format]?.tactics?.standard
-    if (!plan) continue
+  if (previousVersion < 1) {
+    for (const format of ['7v7','9v9']) {
+      const plan = data.formats?.[format]?.tactics?.standard
+      if (!plan) continue
 
-    for (const section of plan.global?.sections || []) {
-      const source = SOURCE_GLOBAL[section.key]
-      if (!source) continue
-      maybe(section.text, 'fr', OLD_FR_GLOBAL[section.key], source.fr)
-      maybe(section.text, 'en', OLD_EN_GLOBAL[section.key], source.en)
-    }
+      for (const section of plan.global?.sections || []) {
+        const source = SOURCE_GLOBAL[section.key]
+        if (!source) continue
+        maybe(section.text, 'fr', OLD_FR_GLOBAL[section.key], source.fr)
+        maybe(section.text, 'en', OLD_EN_GLOBAL[section.key], source.en)
+      }
 
-    for (const player of plan.players || []) {
-      const kind = SOURCE_MAP[format]?.[player.number]
-      const source = SOURCE_ROLES[kind]
-      if (!source) continue
+      for (const player of plan.players || []) {
+        const kind = SOURCE_MAP[format]?.[player.number]
+        const source = SOURCE_ROLES[kind]
+        if (!source) continue
 
-      const oldRoleCandidates = [
-        OLD_FR.goalkeeper.role, OLD_FR.stopper.role, OLD_FR.centralMid.role, OLD_FR.striker.role,
-        'Arrière latéral gauche','Arrière latéral droit','Milieu défensif gauche','Milieu défensif droit',
-        'Ailier gauche','Ailier droit',
-      ]
-      // The original brief maps directly to the 9v9 shirt-number roles. The 7v7
-      // board is a reduced-format adaptation, so keep its existing role labels.
-      if (format === '9v9' && (!player.role?.fr || oldRoleCandidates.includes(player.role.fr))) player.role.fr = source.role
+        const oldRoleCandidates = [
+          OLD_FR.goalkeeper.role, OLD_FR.stopper.role, OLD_FR.centralMid.role, OLD_FR.striker.role,
+          'Arrière latéral gauche','Arrière latéral droit','Milieu défensif gauche','Milieu défensif droit',
+          'Ailier gauche','Ailier droit',
+        ]
+        // Initial source import only. Later coach-authored role labels are preserved.
+        if (format === '9v9' && (!player.role?.fr || oldRoleCandidates.includes(player.role.fr))) player.role.fr = source.role
 
-      for (const section of player.sections || []) {
-        if (!source[section.key]) continue
-        maybeFromCandidates(section.text, 'fr', legacySectionCandidates(kind, section.key), source[section.key])
+        for (const section of player.sections || []) {
+          if (!source[section.key]) continue
+          maybeFromCandidates(section.text, 'fr', legacySectionCandidates(kind, section.key), source[section.key])
+        }
       }
     }
   }
+
+  if (previousVersion < 2) applyNineV9ForwardTextV2(data)
 
   data.coachSourceVersion = COACH_SOURCE_VERSION
   return data
