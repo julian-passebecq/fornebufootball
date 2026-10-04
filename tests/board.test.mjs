@@ -102,3 +102,42 @@ test('after the coach-numbering migration, later manual number edits are preserv
   assert.equal(shirtNumber(again.formats['9v9'].tactics.standard.players.find(p=>p.number===8)),19)
   assert.equal(shirtNumber(again.formats['9v9'].tactics.alternative.players.find(p=>p.number===8)),19)
 })
+
+test('starting formations match the coach reference photos',()=>{
+  const d=normalizeBoard()
+  const expected={
+    '7v7':{1:[8,50],2:[29,24],3:[29,76],4:[39,50],5:[52,19],6:[52,72],7:[58,50]},
+    '9v9':{1:[8,50],2:[34,29],3:[24,50],4:[34,73],5:[50,40],6:[50,61],7:[54,16],8:[60,49],9:[55,75]},
+  }
+  for(const format of ['7v7','9v9']){
+    for(const p of d.formats[format].tactics.standard.players){
+      assert.deepEqual([p.x,p.y],expected[format][p.number])
+    }
+  }
+})
+
+test('coach-photo formation migration does not overwrite the independent ball-loss phase',()=>{
+  let d=normalizeBoard()
+  d.coachFormationVersion=0
+  d.formats['9v9'].tactics.standard.players.find(p=>p.number===8).x=88
+  d.formats['9v9'].tactics.alternative.players.find(p=>p.number===8).x=77
+  const fixed=normalizeBoard(d)
+  assert.deepEqual(
+    [fixed.formats['9v9'].tactics.standard.players.find(p=>p.number===8).x,
+     fixed.formats['9v9'].tactics.standard.players.find(p=>p.number===8).y],
+    [60,49]
+  )
+  assert.equal(fixed.formats['9v9'].tactics.alternative.players.find(p=>p.number===8).x,77)
+  assert.equal(fixed.coachFormationVersion,1)
+})
+
+test('after coach-photo formation migration, later coach position edits are preserved',()=>{
+  let d=normalizeBoard()
+  d=movePlayer(d,'9v9','standard',8,71,47)
+  const again=normalizeBoard(JSON.parse(JSON.stringify(d)))
+  assert.deepEqual(
+    [again.formats['9v9'].tactics.standard.players.find(p=>p.number===8).x,
+     again.formats['9v9'].tactics.standard.players.find(p=>p.number===8).y],
+    [71,47]
+  )
+})
