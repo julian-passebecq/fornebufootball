@@ -121,20 +121,20 @@ const centralMidfielder = player(
 
 const winger = (sideEn, sideNo) => player(
   `${sideEn} winger`, `${sideNo} kant`, 'attacker',
-  'Support the striker and attack the channel.\nMake diagonal runs and play passes in behind.',
-  'Støtt spissen og angrip korridoren.\nTa diagonale løp og spill pasninger i bakrom.',
-  'Be first to help defensively.\nPress the opponent build-up and block the wide outlet.',
-  'Vær først til å hjelpe defensivt.\nPress motstanderens oppbygging og steng pasningen ut på siden.',
-  'Counter quickly and attack the second ball around the striker.',
-  'Kontra raskt og angrip andreballen rundt spissen.',
-  'Protect your side and support the striker.',
-  'Beskytt din side og støtt spissen.'
+  'Protect your channel while supporting the centre-forward.\nPlay around #9 for the second ball.\nLook for through passes to #9 and make diagonal runs.',
+  'Beskytt korridoren din mens du støtter spissen.\nSpill rundt #9 for andreballen.\nSe etter gjennombruddspasninger til #9 og ta diagonale løp.',
+  'Be among the first to help defensively.\nBlock the opponent build-up and press to disrupt the next pass.',
+  'Vær blant de første til å hjelpe defensivt.\nSteng motstanderens oppbygging og press for å forstyrre neste pasning.',
+  'Counter quickly and attack the second ball around #9.',
+  'Kontra raskt og angrip andreballen rundt #9.',
+  'Protect your channel and support #9.',
+  'Beskytt korridoren din og støtt #9.'
 )
 
 const striker = player(
   'Striker', 'Spiss', 'attacker',
-  'Be decisive in front of goal.\nTime your runs to stay onside; attack vertically or diagonally.',
-  'Vær avgjørende foran mål.\nTim løpene for å holde deg onside; angrip vertikalt eller diagonalt.',
+  'Be effective in front of goal: score, score, score.\nUse your explosiveness to get away from defenders.\nAnticipate where the ball will arrive.\nTime your runs to stay onside.\nMake diagonal runs to support the midfielders and vertical runs to score.',
+  'Vær effektiv foran mål: score, score, score.\nBruk eksplosiviteten din til å komme deg fri fra forsvarerne.\nForutse hvor ballen kommer.\nTim løpene for å holde deg onside.\nTa diagonale løp for å støtte midtbanen og vertikale løp for å score.',
   'Start the press and make the first pass difficult.',
   'Start presset og gjør motstanderens første pasning vanskelig.',
   'Explode into space when we win the ball.\nRead where the ball will arrive.',
@@ -161,8 +161,8 @@ export const STANDARD_PLAYER_BRIEF = {
     5: defensiveMidfielder('Left', 'Venstre'),
     6: defensiveMidfielder('Right', 'Høyre'),
     7: winger('Left', 'Venstre'),
-    8: striker,
-    9: winger('Right', 'Høyre'),
+    8: winger('Right', 'Høyre'),
+    9: striker,
   },
 }
 
