@@ -28,12 +28,15 @@ test('coach source-fidelity pass restores detailed original brief concepts',()=>
   const right11=d.formats['9v9'].tactics.standard.players.find(p=>shirtNumber(p)===11)
   const striker9=d.formats['9v9'].tactics.standard.players.find(p=>shirtNumber(p)===9)
   assert.match(p10.sections.find(s=>s.key==='possession').text.fr,/nombre limité de passes/)
+  assert.equal(left8.role.fr,'Ailier gauche')
+  assert.equal(right11.role.fr,'Ailier droit')
+  assert.equal(striker9.role.fr,'Avant-centre')
   assert.match(left8.sections.find(s=>s.key==='possession').text.fr,/Protéger son couloir/)
   assert.match(right11.sections.find(s=>s.key==='possession').text.fr,/Protéger son couloir/)
   assert.match(striker9.sections.find(s=>s.key==='possession').text.fr,/marquer, marquer, marquer/)
   assert.match(striker9.sections.find(s=>s.key==='cue').text.fr,/Marquer, marquer, marquer/)
   assert.match(d.formats['9v9'].tactics.standard.global.sections.find(s=>s.key==='attack').text.en,/midfielder is always available/)
-  assert.equal(d.coachSourceVersion,2)
+  assert.equal(d.coachSourceVersion,3)
 })
 
 test('source-fidelity pass preserves coach-authored French text',()=>{
@@ -71,7 +74,7 @@ test('published version keeps later coach shirt-number and position edits',()=>{
 
 test('9v9 text correction preserves coach role labels and coordinates',()=>{
   let d=normalizeBoard()
-  d.coachSourceVersion=1
+  d.coachSourceVersion=2
   const standard=d.formats['9v9'].tactics.standard.players
   const p8=standard.find(p=>p.number===7)
   const p11=standard.find(p=>p.number===8)
@@ -103,7 +106,7 @@ test('9v9 text correction preserves coach role labels and coordinates',()=>{
   assert.match(next8.sections.find(s=>s.key==='possession').text.fr,/Protéger son couloir/)
   assert.match(next11.sections.find(s=>s.key==='possession').text.fr,/Protéger son couloir/)
   assert.match(next9.sections.find(s=>s.key==='possession').text.fr,/marquer, marquer, marquer/)
-  assert.equal(again.coachSourceVersion,2)
+  assert.equal(again.coachSourceVersion,3)
 })
 
 test('coach photo numbering is corrected even on a structurally current saved board',()=>{
