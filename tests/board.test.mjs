@@ -36,7 +36,7 @@ test('coach source-fidelity pass restores detailed original brief concepts',()=>
   assert.match(striker9.sections.find(s=>s.key==='possession').text.fr,/marquer, marquer, marquer/)
   assert.match(striker9.sections.find(s=>s.key==='cue').text.fr,/Marquer, marquer, marquer/)
   assert.match(d.formats['9v9'].tactics.standard.global.sections.find(s=>s.key==='attack').text.en,/midfielder is always available/)
-  assert.equal(d.coachSourceVersion,3)
+  assert.equal(d.coachSourceVersion,4)
 })
 
 test('source-fidelity pass preserves coach-authored French text',()=>{
@@ -74,7 +74,7 @@ test('published version keeps later coach shirt-number and position edits',()=>{
 
 test('9v9 text correction preserves coach role labels and coordinates',()=>{
   let d=normalizeBoard()
-  d.coachSourceVersion=2
+  d.coachSourceVersion=3
   const standard=d.formats['9v9'].tactics.standard.players
   const p8=standard.find(p=>p.number===7)
   const p11=standard.find(p=>p.number===8)
@@ -90,6 +90,10 @@ test('9v9 text correction preserves coach role labels and coordinates',()=>{
   p8.sections.find(s=>s.key==='possession').text.fr='Créer et orienter le jeu avec un nombre limité de passes.\nSe positionner entre les attaquants et le reste du milieu de terrain.\nAvoir une bonne vision du jeu et une bonne qualité de dribble.\nJouer court quand il y a un surnombre adverse.\nJouer long pour orienter en profondeur, en diagonale ou en transversale.\nCréer des espaces afin de donner des ballons décisifs sur de bonnes passes.'
   p11.sections.find(s=>s.key==='possession').text.fr='Être efficace devant le but : marquer, marquer, marquer des buts.\nFaire preuve d’explosivité pour prendre de vitesse les défenseurs.\nAvoir le sens du but pour anticiper où le ballon va tomber ou arriver.\nMaîtriser le timing des appels pour ne pas être hors-jeu.\nFaire des courses diagonales pour servir de support aux milieux.\nFaire des courses verticales afin de marquer.'
   p9.sections.find(s=>s.key==='possession').text.fr='Protéger son couloir en soutien de l’avant-centre.\nJouer autour du joueur offensif 9 pour jouer le deuxième ballon.\nAssurer des passes en profondeur pour le 9 et faire des courses en diagonale.'
+  p11.role.en='Striker'
+  p11.sections.find(s=>s.key==='possession').text.en='Be decisive in front of goal.\nTime your runs to stay onside; attack vertically or diagonally.'
+  p9.role.en='Right winger'
+  p9.sections.find(s=>s.key==='possession').text.en='Support the striker and attack the channel.\nMake diagonal runs and play passes in behind.'
 
   const again=normalizeBoard(JSON.parse(JSON.stringify(d)))
   const next=again.formats['9v9'].tactics.standard.players
@@ -106,7 +110,13 @@ test('9v9 text correction preserves coach role labels and coordinates',()=>{
   assert.match(next8.sections.find(s=>s.key==='possession').text.fr,/Protéger son couloir/)
   assert.match(next11.sections.find(s=>s.key==='possession').text.fr,/Protéger son couloir/)
   assert.match(next9.sections.find(s=>s.key==='possession').text.fr,/marquer, marquer, marquer/)
-  assert.equal(again.coachSourceVersion,3)
+  assert.equal(next11.role.en,'Right winger')
+  assert.equal(next9.role.en,'Striker')
+  assert.match(next11.sections.find(s=>s.key==='possession').text.en,/Protect your channel/)
+  assert.doesNotMatch(next11.sections.find(s=>s.key==='possession').text.en,/Be decisive in front of goal/)
+  assert.match(next9.sections.find(s=>s.key==='possession').text.en,/score, score, score/)
+  assert.equal(again.coachSourceVersion,4)
+  assert.equal(again.coachSourceVersion,4)
 })
 
 test('coach photo numbering is corrected even on a structurally current saved board',()=>{
