@@ -122,17 +122,17 @@ test('temporary coach scenarios provide three rational alternatives per format',
   assert.equal(TEMP_SCENARIOS['9v9'].length,3)
   assert.equal(getTempScenario('9v9','photo').structure,'1 / 3-4-2 / 7-10 / 8-9-11')
   assert.equal(getTempScenario('9v9','literal-67').structure,'1 / 3-4-2 / 6-7 / 8-9-11')
-  assert.equal(getTempScenario('9v9','staggered-610').structure,'1 / 3-4-2 / 6-10 / 8-9-11')
+  assert.equal(getTempScenario('9v9','french-traditional').structure,'1 / 3-4-2 / 6-8 / 7-9-11')
   assert.equal(getTempScenario('7v7','photo').structure,'1 / 3-2 / 9-4-11 / 10')
   assert.equal(getTempScenario('7v7','literal-67').structure,'1 / 3-4-2 / 6-7 / 9')
-  assert.equal(getTempScenario('7v7','staggered-610').structure,'1 / 3-4-2 / 6-10 / 9')
+  assert.equal(getTempScenario('7v7','french-traditional').structure,'1 / 3-4-2 / 6-8 / 9')
 })
 
 test('temporary scenario preview never mutates the saved board',()=>{
   const d=normalizeBoard()
   const original=JSON.stringify(d)
   const base=d.formats['7v7'].tactics.standard.players
-  const preview=previewPlayers(base,getTempScenario('7v7','staggered-610'))
+  const preview=previewPlayers(base,getTempScenario('7v7','french-traditional'))
   assert.equal(preview.find(p=>p.number===3).shirtNumber,4)
   assert.deepEqual([preview.find(p=>p.number===3).x,preview.find(p=>p.number===3).y],[28,50])
   assert.equal(JSON.stringify(d),original)
@@ -151,5 +151,15 @@ test('every 9v9 preview keeps #9 central and #11 wide',()=>{
     const eleven=preview.find(p=>p.shirtNumber===11)
     assert.deepEqual([nine.x,nine.y],[72,50])
     assert.deepEqual([eleven.x,eleven.y],[68,76])
+  }
+})
+
+test('French comparison never uses #2 as a winger',()=>{
+  for(const format of ['7v7','9v9']){
+    const scenario=getTempScenario(format,'french-traditional')
+    const two=scenario.layout.find(p=>p.shirt===2)
+    const nine=scenario.layout.find(p=>p.shirt===9)
+    assert.ok(two.x < 40)
+    assert.ok(nine.x > 65)
   }
 })
