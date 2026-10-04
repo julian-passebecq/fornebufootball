@@ -3,6 +3,7 @@ import { FORMATION_KEYS, STRATEGY_KEYS } from './tacticsModel.js'
 import { COUNTERPRESS_PRESETS, getCounterPressPreset } from './counterPressPresets.js'
 import { normalizeBoard, copy, localized, shirtNumber, setShirtNumber, setPlayerText, setTeamText, setPrinciple, movePlayer, choosePreset, visibleTeamSections, toDisplay, fromDisplay, resolveOrientation, validateBoard } from './boardModel.js'
 import { UI } from './boardCopy.js'
+import { TEMP_SCENARIOS, getTempScenario, previewPlayers } from './formationScenarios.js'
 import './board.css'
 
 const CLUB_URL = 'https://fornebufk.spond.club/'
@@ -112,6 +113,7 @@ export default function AppBoard() {
   const coachRoute = window.location.pathname.replace(/\/+$/,'') === '/coach'
   const [token,setToken]=useState(initialToken), [lang,setLang]=useState(coachRoute?'fr':'en')
   const [format,setFormat]=useState('7v7'), [phase,setPhase]=useState('standard'), [selected,setSelected]=useState(null)
+  const [tempScenario,setTempScenario]=useState(null)
   const [data,setData]=useState(()=>normalizeBoard()), dataRef=useRef(data)
   const [savedSnapshot,setSavedSnapshot]=useState(''), [loadState,setLoadState]=useState('loading'), [loadAttempt,setLoadAttempt]=useState(0)
   const [saveState,setSaveState]=useState(''), [notice,setNotice]=useState('')
@@ -124,8 +126,10 @@ export default function AppBoard() {
   const dirty=ready && JSON.stringify(data)!==savedSnapshot
   const t=UI[lang], orientation=resolveOrientation(preference,viewport.width,viewport.height)
   const profile=data.formats[format], plan=profile.tactics[phase], players=plan.players
+  const scenario=coachMode && phase==='standard' ? getTempScenario(format,tempScenario) : null
+  const displayPlayers=previewPlayers(players,scenario)
   const player=players.find(p=>p.number===selected)
-  const shape=phase==='alternative'?getCounterPressPreset(format,profile.counterPressPreset)?.shape:data[format].shape
+  const shape=scenario?.shape || (phase==='alternative'?getCounterPressPreset(format,profile.counterPressPreset)?.shape:data[format].shape)
 
   useEffect(()=>{const fn=()=>setViewport({width:window.innerWidth,height:window.innerHeight});window.addEventListener('resize',fn);return()=>window.removeEventListener('resize',fn)},[])
   useEffect(()=>{document.documentElement.lang=lang;document.title=t.title},[lang,t.title])
@@ -159,15 +163,16 @@ export default function AppBoard() {
   function checkpoint(){history.current.push(copy(dataRef.current));if(history.current.length>40)history.current.shift();setUndoCount(history.current.length)}
   function update(next,record=true){if(!editable)return;if(record)checkpoint();dataRef.current=next;setData(next);setSaveState('');setNotice('')}
   function undo(){if(!editable || !history.current.length)return;const last=history.current.pop();dataRef.current=last;setData(last);setUndoCount(history.current.length);setSaveState('')}
-  function chooseFormat(value){setFormat(value);setSelected(null)}
-  function choosePhase(value){setPhase(value);setSelected(null)}
+  function chooseFormat(value){setFormat(value);setSelected(null);setTempScenario(null)}
+  function choosePhase(value){setPhase(value);setSelected(null);if(value!=='standard')setTempScenario(null)}
+  function chooseTempScenario(id){setSelected(null);setTempScenario(current=>current===id?null:id)}
   function selectPlayer(slot){setSelected(selected===slot?null:slot)}
   function move(slot,x,y,record=true){if(editable)update(movePlayer(dataRef.current,format,phase,slot,x,y),record)}
   function nudge(direction){const pos=toDisplay(player.x,player.y,orientation);const p=fromDisplay(pos.x+(direction==='right'?2:direction==='left'?-2:0),pos.y+(direction==='down'?2:direction==='up'?-2:0),orientation);move(player.number,p.x,p.y)}
   function changePreset(id){if(!editable)return;if(profile.counterPressCustom && !window.confirm('Remplacer les positions personnalisées de cette phase par le modèle choisi ?'))return;update(choosePreset(dataRef.current,format,id))}
   function back(){setSelected(null);if(viewport.width<=1180)requestAnimationFrame(()=>boardRef.current?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth',block:'start'}))}
   async function save(){
-    if(!editable || saving.current)return
+    if(!editable || saving.current || scenario)return
     const snapshot=JSON.stringify(dataRef.current)
     if(!validateBoard(dataRef.current)){setSaveState('error');setNotice('Plan invalide : vérifiez les numéros et les positions.');return}
     saving.current=true;setSaveState('saving');setNotice('')
@@ -185,17 +190,18 @@ export default function AppBoard() {
     <header className="topbar">
       <a className="brand" href={CLUB_URL} target="_blank" rel="noreferrer"><ClubMark/><div><strong className="brand-title">{t.title}</strong><strong className="brand-short">Fornebu</strong><span><b>Fornebu FK ↗</b> · {subtitle}</span></div></a>
       <div className="ribbon-controls"><nav className="format-selector" aria-label="Game format">{FORMATION_KEYS.map(key=><button type="button" key={key} className={format===key?'active':''} aria-pressed={format===key} onClick={()=>chooseFormat(key)}>{key}</button>)}</nav><label className="orientation-control"><Icon kind="rotate"/><span className="sr-only">{t.orientation}</span><select aria-label={t.orientation} value={preference} onChange={e=>{setPreference(e.target.value);writeStorage('localStorage',VIEW_KEY,e.target.value)}}><option value="auto">{t.auto}</option><option value="vertical">{t.vertical}</option><option value="horizontal">{t.horizontal}</option></select></label></div>
-      <div className="header-actions">{coachMode && <button type="button" className="validate-button" onClick={save} disabled={!editable} aria-busy={saveState==='saving'} title={lang!=='fr'?'Revenez en FR pour valider':'Publier les textes et positions des deux formats'}>{saveState==='saving'?'VALIDATION…':saveState==='saved'&&!dirty?'VALIDÉ ✓':'VALIDER'}</button>}<nav className={`language-switch ${coachMode?'coach-languages':''}`} aria-label="Language">{(coachMode?['fr','en','no']:['en','fr','no']).map(code=><button type="button" key={code} className={`${lang===code?'active':''} ${coachMode&&code==='fr'?'coach-fr':''}`} aria-pressed={lang===code} title={coachMode?(code==='fr'?'Français : modification':`${code.toUpperCase()} : lecture seule`):code.toUpperCase()} onClick={()=>setLang(code)}>{code.toUpperCase()}</button>)}</nav></div>
+      <div className="header-actions">{coachMode && <button type="button" className="validate-button" onClick={save} disabled={!editable} aria-busy={saveState==='saving'} title={scenario?'Quittez la prévisualisation temporaire avant de valider':lang!=='fr'?'Revenez en FR pour valider':'Publier les textes et positions des deux formats'} disabled={!editable || Boolean(scenario)}>{saveState==='saving'?'VALIDATION…':saveState==='saved'&&!dirty?'VALIDÉ ✓':'VALIDER'}</button>}<nav className={`language-switch ${coachMode?'coach-languages':''}`} aria-label="Language">{(coachMode?['fr','en','no']:['en','fr','no']).map(code=><button type="button" key={code} className={`${lang===code?'active':''} ${coachMode&&code==='fr'?'coach-fr':''}`} aria-pressed={lang===code} title={coachMode?(code==='fr'?'Français : modification':`${code.toUpperCase()} : lecture seule`):code.toUpperCase()} onClick={()=>setLang(code)}>{code.toUpperCase()}</button>)}</nav></div>
     </header>
     <main className={`board-main ${orientation==='vertical'?'vertical-view':''}`}>
       {loadState==='loading' && <div className="status-bar" role="status">{t.loading}</div>}
       {loadState==='error' && <div className="status-bar" role="alert">{coachMode?'Chargement impossible. Rechargez le plan avant de modifier ou publier.':t.offline}<button type="button" onClick={()=>setLoadAttempt(v=>v+1)}>{t.retry}</button></div>}
-      {coachMode && <div className="coach-tools"><button type="button" className="undo-button" onClick={undo} disabled={!editable||!undoCount}><Icon kind="undo"/>Annuler</button><span role="status">{lang!=='fr'?t.preview:dirty?'Modifications non publiées':'Les positions sont propres à chaque phase ; les consignes joueur sont communes.'}</span></div>}
+      {coachMode && <div className="coach-tools"><button type="button" className="undo-button" onClick={undo} disabled={!editable||!undoCount||Boolean(scenario)}><Icon kind="undo"/>Annuler</button><span role="status">{scenario?'PRÉVISUALISATION TEMPORAIRE — rien ne sera enregistré.':lang!=='fr'?t.preview:dirty?'Modifications non publiées':'Les positions sont propres à chaque phase ; les consignes joueur sont communes.'}</span></div>}
+      {coachMode && phase==='standard' && <section className="temp-scenarios" aria-label="Scénarios temporaires"><div className="temp-scenario-head"><strong>Comparaison temporaire des numéros / positions</strong><span>Montrez A, B et C au coach. Recliquez sur le bouton actif pour revenir au plan sauvegardé.</span></div><div className="temp-scenario-buttons">{TEMP_SCENARIOS[format].map(item=><button type="button" key={item.id} className={tempScenario===item.id?'active':''} aria-pressed={tempScenario===item.id} onClick={()=>chooseTempScenario(item.id)}><strong>{item.label}</strong><span>{item.structure}</span><small>{item.note}</small></button>)}</div><p>Référence externe : U.S. Soccer utilise un 1-3-2-1 en 7v7 et un 1-3-2-3 en 9v9 ; en 9v9, les deux milieux peuvent être décalés avec un rôle plus défensif et un plus offensif.</p></section>}
       {notice && coachMode && <div className={`status-bar ${saveState==='error'?'error-status':''}`} role={saveState==='error'?'alert':'status'}>{notice}</div>}
       <div className="workspace-grid">
         <section className="board-card" ref={boardRef}>
           <div className="board-heading"><span className="board-format-pill">{format}</span><span className="formation-center-badge"><small>{t.formation}</small><strong>{shape}</strong></span><span className="active-plan-pill">{t[phase]}</span></div>
-          <Pitch players={players} orientation={orientation} editable={editable} selected={selected} onSelect={selectPlayer} onMove={move} onDragStart={checkpoint} t={t}/>
+          <Pitch players={displayPlayers} orientation={orientation} editable={editable && !scenario} selected={scenario?null:selected} onSelect={scenario?()=>{}:selectPlayer} onMove={move} onDragStart={checkpoint} t={t}/>
           <section className={`principles-panel ${coachMode?'coach-principles':''}`}><div className="in-out-row">{['in','out'].map(key=><div key={key} className={`principle-${key}`}><span>{key.toUpperCase()}</span>{coachMode?<input aria-label={`Principe ${key.toUpperCase()}`} value={localized(profile.principles[key],lang)} readOnly={!editable} onChange={e=>update(setPrinciple(dataRef.current,format,key,e.target.value,lang))}/>:<strong>{localized(profile.principles[key],lang)}</strong>}</div>)}</div>{coachMode && <label className="compact-rule-editor"><span>RÈGLE D’ÉQUIPE EN ROUGE</span><textarea aria-label="Règle d’équipe" rows={2} value={localized(profile.principles.compact,lang)} readOnly={!editable} onChange={e=>update(setPrinciple(dataRef.current,format,'compact',e.target.value,lang))}/></label>}</section>
           <p className="pitch-footer-hint">{editable?'Glissez un maillot pour le déplacer. Touchez-le pour changer son numéro ou ses consignes.':t.select}</p>
         </section>
