@@ -102,6 +102,7 @@ const SOURCE_ROLES = {
     cue:'Lire le jeu, anticiper vite et diriger sa défense avec caractère.',
   },
   fullBack: {
+    role:'Arrière latéral',
     possession:'Participer à la relance en phase offensive.\nMonter sur les ailes pour offrir des solutions.\nCréer le surnombre afin de déborder la défense adverse.\nCentrer vers les attaquants.',
     defence:'Fermer les couloirs en phase défensive pour empêcher les centres adverses.',
     transition:'Après récupération, participer rapidement à la relance et offrir une solution sur l’aile.',
@@ -115,6 +116,7 @@ const SOURCE_ROLES = {
     cue:'Couper les trajectoires dans l’axe et orienter le jeu vers les côtés.',
   },
   defMid: {
+    role:'Milieu défensif',
     possession:'Récupérer les ballons transmis par la défense.\nAssurer les transitions entre la défense et l’attaque.\nÉlargir le jeu et créer de l’espace.\nStabiliser le bloc équipe afin de donner de bons ballons sur les côtés ou verticalement.',
     defence:'Se déplacer constamment pour couvrir l’axe et les côtés.\nCouper les lignes adverses, récupérer le ballon et protéger la défense.',
     transition:'Assurer les transitions entre la défense et l’attaque.',
