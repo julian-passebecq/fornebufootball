@@ -4,7 +4,6 @@ import { applyCoachSourceFidelity } from './coachSourceFidelity.js'
 
 export const BOARD_VERSION = 16
 export const COACH_NUMBERING_VERSION = 1
-export const COACH_FORMATION_VERSION = 1
 
 // Exact shirt numbers from the coach's two formation photos.
 // Slots are stable tactical identities; only the displayed shirt number changes.
@@ -15,23 +14,6 @@ export const REFERENCE_SHIRT_NUMBERS = {
   '9v9': { 1:1, 2:3, 3:4, 4:2, 5:7, 6:10, 7:8, 8:9, 9:11 },
 }
 
-// Starting-formation coordinates traced from the two coach reference photos.
-// Coordinates remain in the board's canonical horizontal system (own goal left).
-export const REFERENCE_START_POSITIONS = {
-  '7v7': {
-    1:[8,50],
-    2:[29,24], 3:[29,76],
-    4:[39,50],
-    5:[52,19], 6:[52,72],
-    7:[58,50],
-  },
-  '9v9': {
-    1:[8,50],
-    2:[34,29], 3:[24,50], 4:[34,73],
-    5:[50,40], 6:[50,61],
-    7:[54,16], 8:[60,49], 9:[55,75],
-  },
-}
 export const copy = value => JSON.parse(JSON.stringify(value))
 export const shirtNumber = player => player.shirtNumber ?? player.number
 export const localized = (value, lang) => typeof value === 'string' ? value : value?.[lang] ?? value?.en ?? value?.fr ?? value?.no ?? ''
@@ -43,22 +25,7 @@ export function normalizeBoard(remote) {
   // board version: an already-published board may be structurally current while
   // still carrying the old shirt numbers.
   const applyReferenceNumbers = Number(remote?.coachNumberingVersion || 0) < COACH_NUMBERING_VERSION
-  const applyReferenceFormation = Number(remote?.coachFormationVersion || 0) < COACH_FORMATION_VERSION
-  const migrated = applyCoachSourceFidelity(migrateRemote(remote))
-
-  if (applyReferenceFormation) {
-    for (const format of FORMATION_KEYS) {
-      const positions = REFERENCE_START_POSITIONS[format]
-      for (const player of migrated.formats[format].tactics.standard.players) {
-        const target = positions?.[player.number]
-        if (!target) continue
-        player.x = target[0]
-        player.y = target[1]
-      }
-    }
-  }
-
-  const next = prepareCounterPressData(migrated)
+  const next = prepareCounterPressData(applyCoachSourceFidelity(migrateRemote(remote)))
   for (const format of FORMATION_KEYS) {
     const profile = next.formats[format]
     const used = new Set()
@@ -82,7 +49,6 @@ export function normalizeBoard(remote) {
     }
   }
   next.coachNumberingVersion = COACH_NUMBERING_VERSION
-  next.coachFormationVersion = COACH_FORMATION_VERSION
   next.version = Math.max(BOARD_VERSION, Number(next.version) || 0)
   return next
 }
