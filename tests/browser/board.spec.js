@@ -48,7 +48,7 @@ test('auto/manual orientation persists and works with 7v7 and 9v9',async({page},
  for(const orientation of ['vertical','horizontal']){await view.selectOption(orientation);await expect(page.locator('.pitch')).toHaveAttribute('data-orientation',orientation);await assertLayout(page);await page.screenshot({path:testInfo.outputPath(`${orientation}.png`),fullPage:true})}
  await page.reload();await expect(page.locator('.pitch')).toHaveAttribute('data-orientation','horizontal')
  await expect(page.locator('.board-format-pill')).toHaveText('7v7');await expect(page.locator('.player-marker')).toHaveCount(7)
- await page.getByRole('button',{name:'9v9',exact:true}).click();await expect(page.locator('.player-marker')).toHaveCount(9);await expect(page.locator('.player-marker .jersey>span')).toHaveText(['1','3','4','2','7','10','8','9','11'])
+ await page.getByRole('button',{name:'9v9',exact:true}).click();await expect(page.locator('.player-marker')).toHaveCount(9);await expect(page.locator('.player-marker .jersey>span')).toHaveText(['1','3','4','2','7','10','8','11','9'])
  await view.selectOption('vertical');await assertLayout(page);expect(ctx.posts).toHaveLength(0);expect(ctx.errors).toEqual([])
 })
 
