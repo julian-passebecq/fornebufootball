@@ -18,7 +18,7 @@ test('invalid save payloads and out-of-range movement are handled',()=>{const d=
 test('coach reference shirt numbers match supplied formation photos',()=>{
   const d=normalizeBoard()
   assert.deepEqual(d.formats['7v7'].tactics.standard.players.map(shirtNumber),[1,3,2,4,9,11,10])
-  assert.deepEqual(d.formats['9v9'].tactics.standard.players.map(shirtNumber),[1,3,4,2,7,10,8,9,11])
+  assert.deepEqual(d.formats['9v9'].tactics.standard.players.map(shirtNumber),[1,3,4,2,7,10,8,11,9])
 })
 
 test('coach source-fidelity pass restores detailed original brief concepts',()=>{
@@ -48,7 +48,7 @@ test('reference shirt numbers are identical in both tactical phases',()=>{
   const d=normalizeBoard()
   for(const [format,expected] of Object.entries({
     '7v7':[1,3,2,4,9,11,10],
-    '9v9':[1,3,4,2,7,10,8,9,11],
+    '9v9':[1,3,4,2,7,10,8,11,9],
   })){
     for(const phase of ['standard','alternative']){
       assert.deepEqual(d.formats[format].tactics[phase].players.map(shirtNumber),expected)
@@ -67,18 +67,14 @@ test('published version keeps later coach shirt-number and position edits',()=>{
   assert.equal(again.formats['7v7'].tactics.standard.players.find(p=>p.number===7).y,44)
 })
 
-test('9v9 coach-source roles follow the shirt numbers in the reference photo',()=>{
+test('9v9 number inversion keeps the existing tactical roles and positions',()=>{
   const d=normalizeBoard()
-  const byShirt=Object.fromEntries(d.formats['9v9'].tactics.standard.players.map(p=>[shirtNumber(p),p]))
-  assert.equal(byShirt[1].role.fr,'Gardien')
-  assert.equal(byShirt[3].role.fr,'Arrière latéral')
-  assert.equal(byShirt[4].role.fr,'Défenseur central stoppeur')
-  assert.equal(byShirt[2].role.fr,'Arrière latéral')
-  assert.equal(byShirt[7].role.fr,'Milieu défensif')
-  assert.equal(byShirt[10].role.fr,'Milieu offensif')
-  assert.equal(byShirt[8].role.fr,'Milieu offensif')
-  assert.equal(byShirt[11].role.fr,'Offensif de couloir')
-  assert.equal(byShirt[9].role.fr,'Avant-centre')
+  const central=d.formats['9v9'].tactics.standard.players.find(p=>p.number===8)
+  const right=d.formats['9v9'].tactics.standard.players.find(p=>p.number===9)
+  assert.equal(shirtNumber(central),11)
+  assert.equal(shirtNumber(right),9)
+  assert.equal(central.role.fr,'Avant-centre')
+  assert.equal(right.role.fr,'Offensif de couloir')
 })
 
 test('coach photo numbering is corrected even on a structurally current saved board',()=>{
@@ -92,26 +88,26 @@ test('coach photo numbering is corrected even on a structurally current saved bo
   }
   const fixed=normalizeBoard(d)
   assert.deepEqual(fixed.formats['7v7'].tactics.standard.players.map(shirtNumber),[1,3,2,4,9,11,10])
-  assert.deepEqual(fixed.formats['9v9'].tactics.standard.players.map(shirtNumber),[1,3,4,2,7,10,8,9,11])
-  assert.equal(fixed.coachNumberingVersion,2)
+  assert.deepEqual(fixed.formats['9v9'].tactics.standard.players.map(shirtNumber),[1,3,4,2,7,10,8,11,9])
+  assert.equal(fixed.coachNumberingVersion,3)
 })
 
 test('after the coach-numbering migration, later manual number edits are preserved',()=>{
   let d=normalizeBoard()
   d=setShirtNumber(d,'9v9',8,19)
-  assert.equal(d.coachNumberingVersion,2)
+  assert.equal(d.coachNumberingVersion,3)
   const again=normalizeBoard(JSON.parse(JSON.stringify(d)))
   assert.equal(shirtNumber(again.formats['9v9'].tactics.standard.players.find(p=>p.number===8)),19)
   assert.equal(shirtNumber(again.formats['9v9'].tactics.alternative.players.find(p=>p.number===8)),19)
 })
 
 
-test('9v9 keeps #9 central and #11 on the right-side attacking slot without moving either player',()=>{
+test('9v9 inverts #9 and #11 without moving either player',()=>{
   const d=normalizeBoard()
   const central=d.formats['9v9'].tactics.standard.players.find(p=>p.number===8)
   const right=d.formats['9v9'].tactics.standard.players.find(p=>p.number===9)
-  assert.equal(shirtNumber(central),9)
-  assert.equal(shirtNumber(right),11)
+  assert.equal(shirtNumber(central),11)
+  assert.equal(shirtNumber(right),9)
   assert.deepEqual([central.x,central.y],[70,50])
   assert.deepEqual([right.x,right.y],[68,75])
 })
