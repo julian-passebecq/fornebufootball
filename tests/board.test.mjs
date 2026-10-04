@@ -121,18 +121,18 @@ test('temporary coach scenarios provide three rational alternatives per format',
   assert.equal(TEMP_SCENARIOS['7v7'].length,3)
   assert.equal(TEMP_SCENARIOS['9v9'].length,3)
   assert.equal(getTempScenario('9v9','photo').structure,'1 / 3-4-2 / 7-10 / 8-9-11')
-  assert.equal(getTempScenario('9v9','double-6-7').structure,'1 / 3-4-2 / 6-7 / 8-9-11')
-  assert.equal(getTempScenario('9v9','staggered-6-10').structure,'1 / 3-4-2 / 6-10 / 8-9-11')
+  assert.equal(getTempScenario('9v9','literal-67').structure,'1 / 3-4-2 / 6-7 / 8-9-11')
+  assert.equal(getTempScenario('9v9','staggered-610').structure,'1 / 3-4-2 / 6-10 / 8-9-11')
   assert.equal(getTempScenario('7v7','photo').structure,'1 / 3-2 / 9-4-11 / 10')
-  assert.equal(getTempScenario('7v7','roles-231').structure,'1 / 3-2 / 8-10-11 / 9')
-  assert.equal(getTempScenario('7v7','us-321').structure,'1 / 3-4-2 / 7-10 / 9')
+  assert.equal(getTempScenario('7v7','literal-67').structure,'1 / 3-4-2 / 6-7 / 9')
+  assert.equal(getTempScenario('7v7','staggered-610').structure,'1 / 3-4-2 / 6-10 / 9')
 })
 
 test('temporary scenario preview never mutates the saved board',()=>{
   const d=normalizeBoard()
   const original=JSON.stringify(d)
   const base=d.formats['7v7'].tactics.standard.players
-  const preview=previewPlayers(base,getTempScenario('7v7','us-321'))
+  const preview=previewPlayers(base,getTempScenario('7v7','staggered-610'))
   assert.equal(preview.find(p=>p.number===3).shirtNumber,4)
   assert.deepEqual([preview.find(p=>p.number===3).x,preview.find(p=>p.number===3).y],[28,50])
   assert.equal(JSON.stringify(d),original)
@@ -140,4 +140,16 @@ test('temporary scenario preview never mutates the saved board',()=>{
     d.formats['7v7'].tactics.standard.players.map(p=>[p.x,p.y]),
     base.map(p=>[p.x,p.y])
   )
+})
+
+test('every 9v9 preview keeps #9 central and #11 wide',()=>{
+  const d=normalizeBoard()
+  const base=d.formats['9v9'].tactics.standard.players
+  for(const scenario of TEMP_SCENARIOS['9v9']){
+    const preview=previewPlayers(base,scenario)
+    const nine=preview.find(p=>p.shirtNumber===9)
+    const eleven=preview.find(p=>p.shirtNumber===11)
+    assert.deepEqual([nine.x,nine.y],[72,50])
+    assert.deepEqual([eleven.x,eleven.y],[68,76])
+  }
 })
