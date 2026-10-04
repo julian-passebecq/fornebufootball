@@ -9,3 +9,17 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+
+# Always revalidate the HTML/app shell so coaches and parents do not keep an
+# older tactical board after a production deploy. Vite assets are content-hashed
+# and can remain aggressively cached.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "no-cache, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
