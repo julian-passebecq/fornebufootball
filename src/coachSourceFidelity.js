@@ -1,7 +1,7 @@
 // Source-fidelity layer for the coach's original "Gardien" brief.
 // It enriches only untouched/default copy. Any field already changed by the coach
 // is deliberately preserved.
-export const COACH_SOURCE_VERSION = 3
+export const COACH_SOURCE_VERSION = 4
 
 const OLD_FR_GLOBAL = {
   start: 'Lever la tête et jouer simple.\nSe déplacer après la passe ; le milieu doit toujours être disponible.',
@@ -255,6 +255,65 @@ function applyNineV9ForwardRolesV3(data) {
   }
 }
 
+function applyNineV9ForwardTranslationsV4(data) {
+  const plan = data.formats?.['9v9']?.tactics?.standard
+  if (!plan?.players) return
+
+  const winger = {
+    possession: {
+      en:'Protect your channel while supporting the centre-forward.\nPlay around #9 for the second ball.\nLook for through passes to #9 and make diagonal runs.',
+      no:'Beskytt korridoren din mens du støtter spissen.\nSpill rundt #9 for andreballen.\nSe etter gjennombruddspasninger til #9 og ta diagonale løp.',
+    },
+    defence: {
+      en:'Be among the first to help defensively.\nBlock the opponent build-up and press to disrupt the next pass.',
+      no:'Vær blant de første til å hjelpe defensivt.\nSteng motstanderens oppbygging og press for å forstyrre neste pasning.',
+    },
+    transition: {
+      en:'Counter quickly and attack the second ball around #9.',
+      no:'Kontra raskt og angrip andreballen rundt #9.',
+    },
+    cue: {
+      en:'Protect your channel and support #9.',
+      no:'Beskytt korridoren din og støtt #9.',
+    },
+  }
+
+  const striker = {
+    possession: {
+      en:'Be effective in front of goal: score, score, score.\nUse your explosiveness to get away from defenders.\nAnticipate where the ball will arrive.\nTime your runs to stay onside.\nMake diagonal runs to support the midfielders and vertical runs to score.',
+      no:'Vær effektiv foran mål: score, score, score.\nBruk eksplosiviteten din til å komme deg fri fra forsvarerne.\nForutse hvor ballen kommer.\nTim løpene for å holde deg onside.\nTa diagonale løp for å støtte midtbanen og vertikale løp for å score.',
+    },
+    defence: {
+      en:'At the loss, join the immediate press and make the first pass difficult.',
+      no:'Ved balltap: delta i det umiddelbare presset og gjør den første pasningen vanskelig.',
+    },
+    transition: {
+      en:'Anticipate the defence and accelerate into space as soon as we win the ball.',
+      no:'Les forsvaret og akselerer inn i rommet så snart vi vinner ballen.',
+    },
+    cue: {
+      en:'Score, score, score.',
+      no:'Score, score, score.',
+    },
+  }
+
+  const fixes = {
+    7: { role:{en:'Left winger',no:'Venstre kant'}, sections:winger },
+    8: { role:{en:'Right winger',no:'Høyre kant'}, sections:winger },
+    9: { role:{en:'Striker',no:'Spiss'}, sections:striker },
+  }
+
+  for (const player of plan.players) {
+    const fix = fixes[player.number]
+    if (!fix) continue
+    player.role = { ...player.role, ...fix.role }
+    for (const section of player.sections || []) {
+      const text = fix.sections[section.key]
+      if (text) section.text = { ...section.text, ...text }
+    }
+  }
+}
+
 export function applyCoachSourceFidelity(data) {
   if (!data?.formats) return data
   const previousVersion = Number(data.coachSourceVersion || 0)
@@ -295,6 +354,7 @@ export function applyCoachSourceFidelity(data) {
 
   if (previousVersion < 2) applyNineV9ForwardTextV2(data)
   if (previousVersion < 3) applyNineV9ForwardRolesV3(data)
+  if (previousVersion < 4) applyNineV9ForwardTranslationsV4(data)
 
   data.coachSourceVersion = COACH_SOURCE_VERSION
   return data
