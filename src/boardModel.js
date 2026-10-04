@@ -3,12 +3,12 @@ import { prepareCounterPressData, applyCounterPressPreset } from './counterPress
 import { applyCoachSourceFidelity } from './coachSourceFidelity.js'
 
 export const BOARD_VERSION = 16
-export const COACH_NUMBERING_VERSION = 1
+export const COACH_NUMBERING_VERSION = 2
 
 // Exact shirt numbers from the coach's two formation photos.
 // Slots are stable tactical identities; only the displayed shirt number changes.
 // 7v7 photo: GK 1; defenders 3/2; midfield line 9/4/11; forward 10.
-// 9v9 photo: GK 1; back three 3/4/2; midfield pair 7/10; front three 8/9/11.
+// 9v9 photo: GK 1; back three 3/4/2; midfield pair 7/10; front three 8/9/11.\n// Important: internal slot 8 is the CENTRAL striker => shirt #9; slot 9 is the right-side attacker => shirt #11.
 export const REFERENCE_SHIRT_NUMBERS = {
   '7v7': { 1:1, 2:3, 3:2, 4:4, 5:9, 6:11, 7:10 },
   '9v9': { 1:1, 2:3, 3:4, 4:2, 5:7, 6:10, 7:8, 8:9, 9:11 },
