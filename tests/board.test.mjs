@@ -93,15 +93,25 @@ test('coach photo numbering is corrected even on a structurally current saved bo
   const fixed=normalizeBoard(d)
   assert.deepEqual(fixed.formats['7v7'].tactics.standard.players.map(shirtNumber),[1,3,2,4,9,11,10])
   assert.deepEqual(fixed.formats['9v9'].tactics.standard.players.map(shirtNumber),[1,3,4,2,7,10,8,9,11])
-  assert.equal(fixed.coachNumberingVersion,1)
+  assert.equal(fixed.coachNumberingVersion,2)
 })
 
 test('after the coach-numbering migration, later manual number edits are preserved',()=>{
   let d=normalizeBoard()
   d=setShirtNumber(d,'9v9',8,19)
-  assert.equal(d.coachNumberingVersion,1)
+  assert.equal(d.coachNumberingVersion,2)
   const again=normalizeBoard(JSON.parse(JSON.stringify(d)))
   assert.equal(shirtNumber(again.formats['9v9'].tactics.standard.players.find(p=>p.number===8)),19)
   assert.equal(shirtNumber(again.formats['9v9'].tactics.alternative.players.find(p=>p.number===8)),19)
 })
 
+
+test('9v9 keeps #9 central and #11 on the right-side attacking slot without moving either player',()=>{
+  const d=normalizeBoard()
+  const central=d.formats['9v9'].tactics.standard.players.find(p=>p.number===8)
+  const right=d.formats['9v9'].tactics.standard.players.find(p=>p.number===9)
+  assert.equal(shirtNumber(central),9)
+  assert.equal(shirtNumber(right),11)
+  assert.deepEqual([central.x,central.y],[70,50])
+  assert.deepEqual([right.x,right.y],[68,75])
+})
