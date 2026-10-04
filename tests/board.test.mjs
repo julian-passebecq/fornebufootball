@@ -24,14 +24,16 @@ test('coach reference shirt numbers match supplied formation photos',()=>{
 test('coach source-fidelity pass restores detailed original brief concepts',()=>{
   const d=normalizeBoard()
   const p10=d.formats['9v9'].tactics.standard.players.find(p=>p.number===6)
-  const p11=d.formats['9v9'].tactics.standard.players.find(p=>p.number===9)
-  const striker=d.formats['9v9'].tactics.standard.players.find(p=>p.number===8)
-  assert.equal(p10.role.fr,'Milieu offensif')
-  assert.equal(p11.role.fr,'Offensif de couloir')
+  const left8=d.formats['9v9'].tactics.standard.players.find(p=>shirtNumber(p)===8)
+  const right11=d.formats['9v9'].tactics.standard.players.find(p=>shirtNumber(p)===11)
+  const striker9=d.formats['9v9'].tactics.standard.players.find(p=>shirtNumber(p)===9)
   assert.match(p10.sections.find(s=>s.key==='possession').text.fr,/nombre limité de passes/)
-  assert.match(striker.sections.find(s=>s.key==='cue').text.fr,/Marquer, marquer, marquer/)
+  assert.match(left8.sections.find(s=>s.key==='possession').text.fr,/Protéger son couloir/)
+  assert.match(right11.sections.find(s=>s.key==='possession').text.fr,/Protéger son couloir/)
+  assert.match(striker9.sections.find(s=>s.key==='possession').text.fr,/marquer, marquer, marquer/)
+  assert.match(striker9.sections.find(s=>s.key==='cue').text.fr,/Marquer, marquer, marquer/)
   assert.match(d.formats['9v9'].tactics.standard.global.sections.find(s=>s.key==='attack').text.en,/midfielder is always available/)
-  assert.equal(d.coachSourceVersion,1)
+  assert.equal(d.coachSourceVersion,2)
 })
 
 test('source-fidelity pass preserves coach-authored French text',()=>{
@@ -67,14 +69,41 @@ test('published version keeps later coach shirt-number and position edits',()=>{
   assert.equal(again.formats['7v7'].tactics.standard.players.find(p=>p.number===7).y,44)
 })
 
-test('9v9 number inversion keeps the existing tactical roles and positions',()=>{
-  const d=normalizeBoard()
-  const central=d.formats['9v9'].tactics.standard.players.find(p=>p.number===8)
-  const right=d.formats['9v9'].tactics.standard.players.find(p=>p.number===9)
-  assert.equal(shirtNumber(central),11)
-  assert.equal(shirtNumber(right),9)
-  assert.equal(central.role.fr,'Avant-centre')
-  assert.equal(right.role.fr,'Offensif de couloir')
+test('9v9 text correction preserves coach role labels and coordinates',()=>{
+  let d=normalizeBoard()
+  d.coachSourceVersion=1
+  const standard=d.formats['9v9'].tactics.standard.players
+  const p8=standard.find(p=>p.number===7)
+  const p11=standard.find(p=>p.number===8)
+  const p9=standard.find(p=>p.number===9)
+
+  p8.role.fr='Ailier gauche'
+  p11.role.fr='Ailier droit'
+  p9.role.fr='Avant-centre'
+  p8.x=73.2; p8.y=24.4
+  p11.x=74.1; p11.y=76.3
+  p9.x=79.5; p9.y=50.2
+
+  p8.sections.find(s=>s.key==='possession').text.fr='Créer et orienter le jeu avec un nombre limité de passes.\nSe positionner entre les attaquants et le reste du milieu de terrain.\nAvoir une bonne vision du jeu et une bonne qualité de dribble.\nJouer court quand il y a un surnombre adverse.\nJouer long pour orienter en profondeur, en diagonale ou en transversale.\nCréer des espaces afin de donner des ballons décisifs sur de bonnes passes.'
+  p11.sections.find(s=>s.key==='possession').text.fr='Être efficace devant le but : marquer, marquer, marquer des buts.\nFaire preuve d’explosivité pour prendre de vitesse les défenseurs.\nAvoir le sens du but pour anticiper où le ballon va tomber ou arriver.\nMaîtriser le timing des appels pour ne pas être hors-jeu.\nFaire des courses diagonales pour servir de support aux milieux.\nFaire des courses verticales afin de marquer.'
+  p9.sections.find(s=>s.key==='possession').text.fr='Protéger son couloir en soutien de l’avant-centre.\nJouer autour du joueur offensif 9 pour jouer le deuxième ballon.\nAssurer des passes en profondeur pour le 9 et faire des courses en diagonale.'
+
+  const again=normalizeBoard(JSON.parse(JSON.stringify(d)))
+  const next=again.formats['9v9'].tactics.standard.players
+  const next8=next.find(p=>p.number===7)
+  const next11=next.find(p=>p.number===8)
+  const next9=next.find(p=>p.number===9)
+
+  assert.equal(next8.role.fr,'Ailier gauche')
+  assert.equal(next11.role.fr,'Ailier droit')
+  assert.equal(next9.role.fr,'Avant-centre')
+  assert.deepEqual([next8.x,next8.y],[73.2,24.4])
+  assert.deepEqual([next11.x,next11.y],[74.1,76.3])
+  assert.deepEqual([next9.x,next9.y],[79.5,50.2])
+  assert.match(next8.sections.find(s=>s.key==='possession').text.fr,/Protéger son couloir/)
+  assert.match(next11.sections.find(s=>s.key==='possession').text.fr,/Protéger son couloir/)
+  assert.match(next9.sections.find(s=>s.key==='possession').text.fr,/marquer, marquer, marquer/)
+  assert.equal(again.coachSourceVersion,2)
 })
 
 test('coach photo numbering is corrected even on a structurally current saved board',()=>{
