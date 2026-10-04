@@ -1,6 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { normalizeBoard, shirtNumber, setShirtNumber, setPlayerText, setTeamText, setPrinciple, movePlayer, choosePreset, visibleTeamSections, toDisplay, fromDisplay, resolveOrientation, validateBoard } from '../src/boardModel.js'
+import { TEMP_SCENARIOS, getTempScenario, previewPlayers } from '../src/formationScenarios.js'
 const formats=['7v7','9v9']
 for(const format of formats){
  test(`${format}: migration preserves customized positions, numbers and French copy`,()=>{let d=normalizeBoard();d=movePlayer(d,format,'alternative',7,81,23);d=setShirtNumber(d,format,7,17);d=setPlayerText(d,format,7,'possession','Consigne du coach');const reloaded=normalizeBoard(JSON.parse(JSON.stringify(d)));assert.equal(shirtNumber(reloaded.formats[format].tactics.alternative.players.find(p=>p.number===7)),17);assert.equal(reloaded.formats[format].tactics.alternative.players.find(p=>p.number===7).x,81);assert.equal(reloaded.formats[format].tactics.standard.players.find(p=>p.number===7).sections[0].text.fr,'Consigne du coach');assert.ok(validateBoard(reloaded))})
@@ -114,4 +115,29 @@ test('9v9 keeps #9 central and #11 on the right-side attacking slot without movi
   assert.equal(shirtNumber(right),11)
   assert.deepEqual([central.x,central.y],[70,50])
   assert.deepEqual([right.x,right.y],[68,75])
+})
+
+test('temporary coach scenarios provide three rational alternatives per format',()=>{
+  assert.equal(TEMP_SCENARIOS['7v7'].length,3)
+  assert.equal(TEMP_SCENARIOS['9v9'].length,3)
+  assert.equal(getTempScenario('9v9','photo').structure,'1 / 3-4-2 / 7-10 / 8-9-11')
+  assert.equal(getTempScenario('9v9','double-6-7').structure,'1 / 3-4-2 / 6-7 / 8-9-11')
+  assert.equal(getTempScenario('9v9','staggered-6-10').structure,'1 / 3-4-2 / 6-10 / 8-9-11')
+  assert.equal(getTempScenario('7v7','photo').structure,'1 / 3-2 / 9-4-11 / 10')
+  assert.equal(getTempScenario('7v7','roles-231').structure,'1 / 3-2 / 8-10-11 / 9')
+  assert.equal(getTempScenario('7v7','us-321').structure,'1 / 3-4-2 / 7-10 / 9')
+})
+
+test('temporary scenario preview never mutates the saved board',()=>{
+  const d=normalizeBoard()
+  const original=JSON.stringify(d)
+  const base=d.formats['7v7'].tactics.standard.players
+  const preview=previewPlayers(base,getTempScenario('7v7','us-321'))
+  assert.equal(preview.find(p=>p.number===3).shirtNumber,4)
+  assert.deepEqual([preview.find(p=>p.number===3).x,preview.find(p=>p.number===3).y],[28,50])
+  assert.equal(JSON.stringify(d),original)
+  assert.deepEqual(
+    d.formats['7v7'].tactics.standard.players.map(p=>[p.x,p.y]),
+    base.map(p=>[p.x,p.y])
+  )
 })
