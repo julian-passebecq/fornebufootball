@@ -51,6 +51,7 @@ const OLD_FR = {
     cue:'Être décisif, communiquer et organiser.',
   },
   fullBack: {
+    role:'Arrière latéral',
     possession:'Participer à la relance.\nMonter dans le couloir pour créer le surnombre et centrer.',
     defence:'Fermer le couloir et empêcher les centres.\nProtéger d’abord l’intérieur.',
     transition:'Revenir vite, puis offrir une solution large à la récupération.',
@@ -64,6 +65,7 @@ const OLD_FR = {
     cue:'Protéger l’axe en priorité.',
   },
   defMid: {
+    role:'Milieu défensif',
     possession:'Recevoir les ballons de la défense et relier le jeu.\nÉlargir le jeu et jouer sur les côtés ou verticalement.',
     defence:'Couvrir l’axe et les côtés.\nCouper les lignes de passe et protéger la défense.',
     transition:'Assurer la transition défense-attaque et réagir vite sur les deuxièmes ballons.',
